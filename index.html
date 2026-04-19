@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="OG League IPL 2026 fantasy leaderboard">
+<meta name="theme-color" content="#0A1B3D">
+<title>OG LEAGUE · IPL 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0A1B3D; --navy-d: #061129; --navy-l: #122C5C;
+  --navy-card: #0F2450; --navy-card-l: #163066;
+  --gold: #FFC72C; --gold-d: #E5A800; --gold-l: #FFD966;
+  --white: #FFFFFF; --off: #E8ECF4; --mute: #8B95AD; --dim: #5A6580;
+  --line: rgba(255,199,44,0.15); --line-h: rgba(255,255,255,0.12);
+  --display: 'Anton', 'Impact', sans-serif;
+  --head: 'Barlow Condensed', sans-serif;
+  --body: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { background: var(--navy-d); color: var(--off); font-family: var(--body); font-size: 15px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 1200px 700px at 70% -10%, rgba(255,199,44,0.08), transparent 60%), radial-gradient(ellipse 900px 600px at 10% 30%, rgba(18,44,92,0.6), transparent 60%), linear-gradient(180deg, var(--navy-d) 0%, var(--navy) 50%, var(--navy-d) 100%); z-index: 0; pointer-events: none; }
+body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,199,44,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,199,44,0.02) 1px, transparent 1px); background-size: 48px 48px; z-index: 0; pointer-events: none; mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%); }
+
+#opener { position: fixed; inset: 0; z-index: 999; background: var(--navy-d); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem; transition: opacity 0.7s ease; }
+#opener::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 1200px 700px at 50% 20%, rgba(255,199,44,0.15), transparent 60%), radial-gradient(ellipse 800px 500px at 50% 80%, rgba(18,44,92,0.4), transparent 60%); pointer-events: none; }
+#opener.gone { opacity: 0; pointer-events: none; }
+.op-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2rem; max-width: 800px; text-align: center; }
+.op-badge { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; padding: 0.4rem 1.2rem; border: 1px solid var(--gold); border-radius: 2px; }
+.op-title { font-family: var(--display); font-size: clamp(4rem, 14vw, 8.5rem); line-height: 0.85; letter-spacing: -0.02em; color: var(--white); text-transform: uppercase; }
+.op-title .gold { color: var(--gold); }
+.op-sub { font-family: var(--head); font-weight: 500; font-size: 1.15rem; letter-spacing: 0.1em; color: var(--off); text-transform: uppercase; max-width: 500px; }
+.op-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.op-chip { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.4rem 0.9rem; border: 1.5px solid currentColor; border-radius: 2px; }
+.op-btn { background: var(--gold); color: var(--navy); border: none; padding: 1rem 2.5rem; font-family: var(--head); font-weight: 800; font-size: 1.05rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: all 0.2s ease; position: relative; overflow: hidden; }
+.op-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.3), transparent); transform: translateX(-100%); transition: transform 0.5s; }
+.op-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255,199,44,0.4); }
+.op-btn:hover::before { transform: translateX(100%); }
+.op-btn:active { transform: translateY(0); }
+.op-audio-note { font-family: var(--mono); font-size: 0.68rem; color: var(--mute); letter-spacing: 0.1em; }
+.op-audio-note svg { width: 12px; height: 12px; vertical-align: -2px; margin-right: 4px; }
+
+.header { position: sticky; top: 0; z-index: 100; background: rgba(10,27,61,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--line); padding: 0.9rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.hdr-logo { font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.02em; color: var(--white); text-transform: uppercase; }
+.hdr-logo .gold { color: var(--gold); }
+.hdr-right { display: flex; align-items: center; gap: 0.75rem; }
+.hdr-live { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; padding: 0.3rem 0.7rem; border: 1px solid var(--line); border-radius: 12px; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+.hdr-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.audio-toggle { background: transparent; border: 1px solid var(--line); color: var(--gold); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.audio-toggle:hover { border-color: var(--gold); background: rgba(255,199,44,0.08); }
+.audio-toggle svg { width: 14px; height: 14px; }
+
+.wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--line); margin-bottom: 2.5rem; }
+.hero-kicker { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.8rem; }
+.hero-title { font-family: var(--display); font-size: clamp(2.8rem, 7vw, 5.5rem); line-height: 0.9; letter-spacing: -0.01em; text-transform: uppercase; color: var(--white); margin-bottom: 0.75rem; }
+.hero-title .gold { color: var(--gold); }
+.hero-sub { font-family: var(--head); font-size: 1.25rem; font-weight: 500; color: var(--off); line-height: 1.4; max-width: 700px; letter-spacing: 0.01em; }
+.hero-sub em { color: var(--gold); font-style: normal; font-weight: 700; }
+
+.hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 2rem; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.hero-stat { background: rgba(15,36,80,0.5); padding: 1.25rem 1.25rem; position: relative; }
+.hs-lbl { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--mute); text-transform: uppercase; margin-bottom: 0.5rem; }
+.hs-val { font-family: var(--display); font-size: 2rem; line-height: 1; color: var(--gold); }
+.hs-val .small { font-size: 0.55em; color: var(--white); margin-left: 0.15em; }
+.hs-name { font-family: var(--head); font-size: 0.85rem; color: var(--off); margin-top: 0.3rem; font-weight: 500; line-height: 1.2; }
+.hs-context { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); letter-spacing: 0.05em; margin-top: 0.15rem; }
+@media (max-width: 760px) { .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+
+.sec { margin-bottom: 2.5rem; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
+.sec-title { font-family: var(--display); font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: 0.01em; color: var(--white); text-transform: uppercase; display: flex; align-items: baseline; gap: 0.6rem; }
+.sec-title-num { font-family: var(--mono); font-size: 0.6em; color: var(--gold); letter-spacing: 0; }
+.sec-dek { font-family: var(--body); font-size: 0.88rem; color: var(--mute); max-width: 44ch; }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line-h); margin-bottom: 1.5rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { background: transparent; border: none; color: var(--mute); font-family: var(--head); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.7rem 1.1rem; cursor: pointer; white-space: nowrap; position: relative; transition: color 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab:hover { color: var(--off); }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab .ct { font-family: var(--mono); font-size: 0.7em; color: var(--dim); margin-left: 0.35rem; }
+
+.standings { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.stand { background: var(--navy-card); border: 1px solid var(--line); border-radius: 6px; padding: 1.5rem 1.25rem; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+.stand::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--tc); }
+.stand:hover { transform: translateY(-3px); border-color: var(--gold); }
+.stand-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.stand-rank { font-family: var(--display); font-size: 2.5rem; line-height: 1; color: var(--gold); }
+.stand-medal { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--mute); text-transform: uppercase; }
+.stand-team { font-family: var(--display); font-size: 1.35rem; line-height: 1.1; color: var(--white); text-transform: uppercase; letter-spacing: 0.01em; margin-bottom: 0.3rem; }
+.stand-cap { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; color: var(--mute); text-transform: uppercase; margin-bottom: 1rem; }
+.stand-cap b { color: var(--off); font-weight: 600; }
+.stand-pts { font-family: var(--display); font-size: 3rem; line-height: 1; color: var(--gold); letter-spacing: -0.01em; margin-bottom: 0.2rem; }
+.stand-lbl { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--dim); text-transform: uppercase; margin-bottom: 1rem; }
+.stand-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 0.5rem; }
+.stand-bar-fill { height: 100%; background: linear-gradient(90deg, var(--tc), var(--gold)); border-radius: 2px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+.stand-gap { font-family: var(--mono); font-size: 0.65rem; color: var(--mute); letter-spacing: 0.1em; }
+.stand-gap.lead { color: var(--gold); }
+
+.awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.award { background: var(--navy-card); padding: 1.5rem 1.25rem; transition: background 0.2s; }
+.award:hover { background: var(--navy-card-l); }
+.aw-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--gold); color: var(--navy); border-radius: 50%; font-family: var(--display); font-size: 1rem; margin-bottom: 1rem; }
+.aw-lbl { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.5rem; }
+.aw-name { font-family: var(--head); font-weight: 700; font-size: 1.1rem; color: var(--white); line-height: 1.15; }
+.aw-team { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--mute); text-transform: uppercase; margin: 0.25rem 0 0.75rem; }
+.aw-val { font-family: var(--display); font-size: 2.2rem; line-height: 1; color: var(--gold); }
+.aw-val .sm { font-size: 0.6em; color: var(--off); margin-left: 0.15em; }
+.aw-ctx { font-family: var(--body); font-size: 0.72rem; color: var(--dim); margin-top: 0.5rem; }
+
+.match-ctrls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.ctrl-btn { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; background: transparent; color: var(--mute); border: 1px solid var(--line-h); padding: 0.4rem 0.8rem; cursor: pointer; border-radius: 3px; transition: all 0.15s; }
+.ctrl-btn:hover { color: var(--off); border-color: var(--line); }
+.ctrl-btn.active { color: var(--navy); background: var(--gold); border-color: var(--gold); font-weight: 700; }
+
+.match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; }
+.m-card { background: var(--navy-card); border: 1px solid var(--line); border-radius: 6px; padding: 1.1rem; cursor: pointer; transition: border-color 0.15s, transform 0.15s; display: flex; flex-direction: column; min-height: 190px; }
+.m-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.m-card.abnd { opacity: 0.45; cursor: default; }
+.m-card.abnd:hover { border-color: var(--line); transform: none; }
+.m-head { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.6rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--line-h); }
+.m-head .mn { color: var(--gold); font-weight: 700; }
+.m-teams { font-family: var(--head); font-weight: 700; font-size: 1.1rem; color: var(--white); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 0.25rem; }
+.m-result { font-family: var(--body); font-size: 0.72rem; color: var(--mute); margin-bottom: 0.9rem; }
+.m-bars { display: flex; flex-direction: column; gap: 0.3rem; margin-top: auto; }
+.mbr { display: grid; grid-template-columns: 36px 1fr 40px; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.7rem; }
+.mbr-t { font-weight: 700; letter-spacing: 0.05em; }
+.mbr-tr { height: 4px; background: rgba(255,255,255,0.06); position: relative; overflow: hidden; border-radius: 2px; }
+.mbr-f { height: 100%; border-radius: 2px; }
+.mbr-p { text-align: right; color: var(--off); font-weight: 500; }
+.mbr-win .mbr-p { color: var(--gold); font-weight: 700; }
+.m-hint { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em; color: var(--dim); text-transform: uppercase; margin-top: 0.75rem; text-align: center; }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(6,17,41,0.85); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.2s ease; }
+.modal-bg.open { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--navy-card); border: 1px solid var(--gold); border-radius: 8px; max-width: 750px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-close { position: absolute; top: 1rem; right: 1rem; background: transparent; border: 1px solid var(--line); color: var(--off); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; line-height: 1; transition: all 0.15s; }
+.modal-close:hover { border-color: var(--gold); color: var(--gold); }
+.modal-head { margin-bottom: 1.5rem; padding-right: 3rem; }
+.modal-num { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; }
+.modal-title { font-family: var(--display); font-size: 2rem; line-height: 1; color: var(--white); text-transform: uppercase; margin: 0.3rem 0; }
+.modal-result { font-family: var(--body); font-size: 0.85rem; color: var(--mute); }
+.modal-teams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem; }
+@media (max-width: 560px) { .modal-teams { grid-template-columns: 1fr; } }
+.mt-block { background: var(--navy-card); padding: 1rem 1.2rem; }
+.mt-name { font-family: var(--head); font-weight: 700; font-size: 0.95rem; color: var(--tc); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.mt-pts { font-family: var(--display); font-size: 2.5rem; line-height: 1; color: var(--gold); }
+.mt-lbl { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.2em; color: var(--dim); text-transform: uppercase; margin-top: 0.2rem; }
+.modal-perfs { margin-top: 1.25rem; }
+.mp-head { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); }
+.mp-list { display: flex; flex-direction: column; }
+.mp-row { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px dashed var(--line-h); align-items: center; }
+.mp-row:last-child { border-bottom: none; }
+.mp-name-col { display: flex; flex-direction: column; gap: 0.15rem; }
+.mp-name { font-family: var(--body); font-weight: 600; font-size: 0.88rem; color: var(--white); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.mp-team { font-family: var(--mono); font-size: 0.55rem; padding: 1px 5px; border-radius: 2px; color: var(--navy-d); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.mp-perf { font-family: var(--mono); font-size: 0.72rem; color: var(--mute); margin-top: 0.1rem; }
+.mp-perf b { color: var(--off); font-weight: 500; }
+.mp-pts { font-family: var(--display); font-size: 1.4rem; color: var(--gold); line-height: 1; }
+.cap-badge { font-family: var(--mono); font-size: 0.5rem; padding: 1px 4px; background: var(--gold); color: var(--navy-d); font-weight: 700; letter-spacing: 0.08em; border-radius: 2px; }
+.cap-badge.vc { background: var(--gold-d); color: var(--navy); }
+
+.pullbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--gold); border-radius: 6px; overflow: hidden; margin: 2.5rem 0; }
+.pullbar > div { background: var(--navy-card); padding: 1.5rem 1.25rem; position: relative; }
+.pb-num { font-family: var(--display); font-size: clamp(2rem, 4vw, 3rem); line-height: 1; color: var(--gold); letter-spacing: -0.01em; }
+.pb-lbl { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.15em; color: var(--mute); text-transform: uppercase; margin-top: 0.5rem; line-height: 1.4; }
+@media (max-width: 760px) { .pullbar { grid-template-columns: repeat(2, 1fr); } }
+
+.roster-ctrls { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center; }
+.search-box { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+.search-box input { width: 100%; background: var(--navy-card); border: 1px solid var(--line-h); color: var(--white); font-family: var(--body); font-size: 0.88rem; padding: 0.55rem 0.85rem 0.55rem 2rem; border-radius: 4px; transition: border-color 0.2s; }
+.search-box input:focus { outline: none; border-color: var(--gold); }
+.search-box input::placeholder { color: var(--dim); }
+.search-box svg { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--mute); }
+
+.player-table { background: var(--navy-card); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.pt-head { display: grid; grid-template-columns: 40px 1.4fr 1.3fr 1fr 50px 70px; padding: 0.7rem 1rem; background: rgba(255,199,44,0.06); border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; font-weight: 700; gap: 0.75rem; }
+.pt-head .ch { cursor: pointer; user-select: none; transition: color 0.15s; display: flex; align-items: center; gap: 0.3rem; }
+.pt-head .ch:hover { color: var(--white); }
+.pt-head .ch.right { justify-content: flex-end; }
+.pt-head .ch.sorted::after { content: '▼'; font-size: 0.7em; }
+.pt-head .ch.sorted.asc::after { content: '▲'; }
+.pt-row { display: grid; grid-template-columns: 40px 1.4fr 1.3fr 1fr 50px 70px; padding: 0.65rem 1rem; border-bottom: 1px solid var(--line-h); font-size: 0.85rem; gap: 0.75rem; align-items: center; transition: background 0.1s; }
+.pt-row:hover { background: rgba(255,199,44,0.04); }
+.pt-row:last-child { border-bottom: none; }
+.pt-row.hidden { display: none; }
+.pt-row.zero { opacity: 0.4; }
+.pt-rank { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); font-weight: 500; }
+.pt-name { font-family: var(--body); font-weight: 600; color: var(--white); display: flex; align-items: center; gap: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-team { font-family: var(--head); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.02em; color: var(--tc); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-bar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; position: relative; }
+.pt-bar-f { height: 100%; background: var(--tc); border-radius: 2px; transition: width 0.6s ease; }
+.pt-m { font-family: var(--mono); font-size: 0.72rem; color: var(--mute); text-align: right; }
+.pt-pts { font-family: var(--display); font-size: 1.1rem; color: var(--gold); text-align: right; }
+
+@media (max-width: 640px) {
+  .pt-head, .pt-row { grid-template-columns: 30px 1.3fr 0.8fr 40px 60px; gap: 0.5rem; padding: 0.6rem 0.7rem; font-size: 0.8rem; }
+  .pt-head .ch-bar, .pt-row .pt-bar { display: none; }
+}
+
+.footer { text-align: center; padding: 3rem 1rem 2rem; border-top: 1px solid var(--line); margin-top: 3rem; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.15em; color: var(--dim); text-transform: uppercase; }
+.footer b { color: var(--gold); font-weight: 700; }
+.footer div { margin: 0.3rem 0; }
+
+.team-cad { --tc: #FF6B35; }
+.team-dxi { --tc: #FFC72C; }
+.team-shs { --tc: #10B981; }
+.team-zlt { --tc: #A855F7; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 1.5rem 1rem 3rem; }
+  .header { padding: 0.75rem 1rem; }
+  .hdr-logo { font-size: 1.05rem; }
+  .hero { padding: 1.5rem 0 1.5rem; }
+  .hero-stat { padding: 1rem; }
+  .hs-val { font-size: 1.6rem; }
+  .modal { padding: 1.3rem; }
+  .modal-title { font-size: 1.5rem; }
+}
+@keyframes slideUpIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.stand, .m-card, .award { animation: slideUpIn 0.4s ease-out both; }
+.stand:nth-child(2) { animation-delay: 0.05s; }
+.stand:nth-child(3) { animation-delay: 0.1s; }
+.stand:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+<div id="opener">
+  <div class="op-inner">
+    <div class="op-badge">A Fantasy Cricket League</div>
+    <h1 class="op-title">OG <span class="gold">LEAGUE</span></h1>
+    <div class="op-sub">Loading...</div>
+    <div class="op-chips">
+      <div class="op-chip" style="color:#FF6B35">Ctrl Alt Defeat</div>
+      <div class="op-chip" style="color:#FFD966">Dashboard XI</div>
+      <div class="op-chip" style="color:#10B981">Shalini's Strikers</div>
+      <div class="op-chip" style="color:#A855F7">Zlatan's Team</div>
+    </div>
+    <button class="op-btn" id="enterBtn">Enter Dashboard →</button>
+    <div class="op-audio-note">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      Theme plays automatically · Tap icon in header to mute
+    </div>
+  </div>
+</div>
+<audio id="themeAudio" loop preload="none">
+  <source src="ipl-theme.mp3" type="audio/mpeg">
+</audio>
+<header class="header">
+  <div class="hdr-logo">OG <span class="gold">LEAGUE</span> · IPL 2026</div>
+  <div class="hdr-right">
+    <div class="hdr-live">Live</div>
+    <button class="audio-toggle" id="audioToggle" title="Toggle music">
+      <svg id="volOn" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      <svg id="volOff" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.17v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+    </button>
+  </div>
+</header>
+<div class="wrap">
+<section class="hero">
+  <div class="hero-kicker">Loading...</div>
+  <h1 class="hero-title">Loading...</h1>
+  <p class="hero-sub">Calculating latest stats...</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hs-lbl">Season MVP</div>
+      <div class="hs-val">-</div>
+      <div class="hs-name">-</div>
+      <div class="hs-context">-</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-lbl">Top Score</div>
+      <div class="hs-val">115<span class="small">(56)</span></div>
+      <div class="hs-name">Sanju Samson</div>
+      <div class="hs-context">CSK vs DC</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-lbl">Best Bowling</div>
+      <div class="hs-val">4<span class="small">/30</span></div>
+      <div class="hs-name">Ravi Bishnoi</div>
+      <div class="hs-context">GT vs RR</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-lbl">Biggest Haul</div>
+      <div class="hs-val">656</div>
+      <div class="hs-name">Zlatan's Team</div>
+      <div class="hs-context">M24 · MI vs PBKS</div>
+    </div>
+  </div>
+</section>
+<section class="sec">
+  <div class="sec-head">
+    <h2 class="sec-title"><span class="sec-title-num">01 /</span> STANDINGS</h2>
+    <p class="sec-dek">Tap any team to jump to their roster.</p>
+  </div>
+  <div class="standings" id="standings"></div>
+</section>
+<div class="pullbar">
+  <div><div class="pb-num">0</div><div class="pb-lbl">Total points · All teams</div></div>
+  <div><div class="pb-num">0</div><div class="pb-lbl">Matches contested</div></div>
+  <div><div class="pb-num">19</div><div class="pb-lbl">Max active players in any squad</div></div>
+  <div><div class="pb-num">0</div><div class="pb-lbl">Total players with appearances</div></div>
+</div>
+<section class="sec">
+  <div class="sec-head">
+    <h2 class="sec-title"><span class="sec-title-num">02 /</span> AWARDS</h2>
+    <p class="sec-dek">Raw performance — captaincy stripped.</p>
+  </div>
+  <div class="awards">
+    <div class="award">
+      <div class="aw-icon">B</div>
+      <div class="aw-lbl">Top Batter</div>
+      <div class="aw-name">Abhishek Sharma</div>
+      <div class="aw-team">Ctrl Alt Defeat</div>
+      <div class="aw-val">565<span class="sm">pts</span></div>
+      <div class="aw-ctx">Batting points only</div>
+    </div>
+    <div class="award">
+      <div class="aw-icon">P</div>
+      <div class="aw-lbl">Top Bowler</div>
+      <div class="aw-name">Bhuvneshwar Kumar</div>
+      <div class="aw-team">Zlatan's Team</div>
+      <div class="aw-val">514<span class="sm">pts</span></div>
+      <div class="aw-ctx">Bowling points only</div>
+    </div>
+    <div class="award">
+      <div class="aw-icon">F</div>
+      <div class="aw-lbl">Top Fielder</div>
+      <div class="aw-name">Ishan Kishan</div>
+      <div class="aw-team">Zlatan's Team</div>
+      <div class="aw-val">84<span class="sm">pts</span></div>
+      <div class="aw-ctx">Catches, stumpings, run-outs</div>
+    </div>
+    <div class="award">
+      <div class="aw-icon">★</div>
+      <div class="aw-lbl">Season MVP</div>
+      <div class="aw-name" id="awMvpName">Loading...</div>
+      <div class="aw-team" id="awMvpTeam">Loading...</div>
+      <div class="aw-val"><span id="awMvpVal">-</span><span class="sm">pts</span></div>
+      <div class="aw-ctx">With captaincy multiplier</div>
+    </div>
+  </div>
+</section>
+<section class="sec">
+  <div class="sec-head">
+    <h2 class="sec-title"><span class="sec-title-num">03 /</span> MATCHES</h2>
+    <p class="sec-dek">Click any card to see player breakdowns.</p>
+  </div>
+  <div class="match-ctrls" id="matchCtrls">
+    <button class="ctrl-btn active" data-filter="all">All</button>
+    <button class="ctrl-btn" data-filter="Ctrl Alt Defeat">Ctrl Alt won</button>
+    <button class="ctrl-btn" data-filter="Dashboard XI">Dashboard won</button>
+    <button class="ctrl-btn" data-filter="Shalini's Strikers">Shalini's won</button>
+    <button class="ctrl-btn" data-filter="Zlatan's Team">Zlatan's won</button>
+  </div>
+  <div class="match-grid" id="matchGrid"></div>
+</section>
+<section class="sec">
+  <div class="sec-head">
+    <h2 class="sec-title"><span class="sec-title-num">04 /</span> PLAYERS</h2>
+    <p class="sec-dek">Search, filter by team, sort any column.</p>
+  </div>
+  <div class="roster-ctrls">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="playerSearch" placeholder="Search any player...">
+    </div>
+  </div>
+  <div class="tabs" id="teamTabs">
+    <button class="tab active" data-team="all">All Players <span class="ct">80</span></button>
+    <button class="tab" data-team="Ctrl Alt Defeat">Ctrl Alt Defeat <span class="ct">20</span></button>
+    <button class="tab" data-team="Dashboard XI">Dashboard XI <span class="ct">20</span></button>
+    <button class="tab" data-team="Shalini's Strikers">Shalini's Strikers <span class="ct">20</span></button>
+    <button class="tab" data-team="Zlatan's Team">Zlatan's Team <span class="ct">20</span></button>
+  </div>
+  <div class="player-table">
+    <div class="pt-head">
+      <span>#</span>
+      <span class="ch" data-sort="name">Player</span>
+      <span class="ch" data-sort="team">Team</span>
+      <span class="ch ch-bar">Distribution</span>
+      <span class="ch right" data-sort="matches">M</span>
+      <span class="ch right sorted" data-sort="pts">Pts</span>
+    </div>
+    <div id="playerList"></div>
+  </div>
+</section>
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<footer class="footer">
+  <div><b>OG LEAGUE</b> · IPL 2026 · AuctionRoom v1.1</div>
+  <div>Loading...</div>
+  <div>Updated Loading...</div>
+</footer>
+</div>
+<script>
+const DATA = {
+  "teams": {
+    "Ctrl Alt Defeat": { "color": "#FF6B35", "c": "Virat Kohli", "vc": "Abhishek Sharma" },
+    "Dashboard XI": { "color": "#FFD700", "c": "Phil Salt", "vc": "Shivam Dube" },
+    "Shalini's Strikers": { "color": "#10B981", "c": "Vaibhav Sooryavanshi", "vc": "Hardik Pandya" },
+    "Zlatan's Team": { "color": "#A855F7", "c": "Shreyas Iyer", "vc": "Ishan Kishan" }
+  },
+  "matches": {
+    "1": {"label": "RCB vs SRH", "date": "Mar 28", "result": "RCB won by 6 wkts", "abandoned": false, "performances": {"Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "31(22) 2x4 1x6", "bowl": null, "field": "2c", "pts": 71}, "Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": "0(1) 0x4 0x6", "bowl": null, "field": "1c", "pts": 10}, "Jaydev Unadkat": {"team": "", "bat": null, "bowl": "1/29 (3)", "field": null, "pts": 46}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "61(26) 7x4 4x6", "bowl": null, "field": "3c", "pts": 161}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": null, "bowl": "0/26 (2)", "field": null, "pts": 0}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "69(38) 5x4 5x6", "bowl": null, "field": "1c", "pts": 290}, "Phil Salt": {"team": "Dashboard XI", "bat": "8(7) 2x4 0x6", "bowl": null, "field": "3c", "pts": 96}, "Tim David": {"team": "Dashboard XI", "bat": "16(10) 1x4 1x6", "bowl": null, "field": null, "pts": 34}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": null, "bowl": "1/31 (4)", "field": null, "pts": 54}, "Travis Head": {"team": "Zlatan's Team", "bat": "11(9) 2x4 0x6", "bowl": null, "field": null, "pts": 23}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "80(38) 8x4 5x6", "bowl": null, "field": "1c", "pts": 261}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "1(6) 0x4 0x6", "bowl": "0/19 (2)", "field": null, "pts": 15}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": null, "bowl": "3/54 (4)", "field": null, "pts": 106}, "Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "7(8) 0x4 1x6", "bowl": null, "field": null, "pts": 26}}}, 
+    "2": {"label": "MI vs KKR", "date": "Mar 29", "result": "MI won by 6 wkts", "abandoned": false, "performances": {"Angkrish Raghuvanshi": {"team": "Zlatan's Team", "bat": "51(29) 6x4 2x6", "bowl": null, "field": null, "pts": 105}, "Sunil Narine": {"team": "Dashboard XI", "bat": null, "bowl": "1/30 (3)", "field": null, "pts": 46}, "Ryan Rickelton": {"team": "Ctrl Alt Defeat", "bat": "81(43) 4x4 8x6", "bowl": null, "field": null, "pts": 167}, "Tilak Varma": {"team": "Zlatan's Team", "bat": "20(14) 4x4 0x6", "bowl": null, "field": "2c", "pts": 58}, "Suryakumar Yadav": {"team": "Shalini's Strikers", "bat": "16(8) 3x4 0x6", "bowl": null, "field": null, "pts": 32}, "Rohit Sharma": {"team": "Ctrl Alt Defeat", "bat": "78(38) 6x4 6x6", "bowl": null, "field": null, "pts": 162}, "Trent Boult": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/38 (4)", "field": null, "pts": 18}, "Sherfane Rutherford": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": "1c", "pts": 12}, "Hardik Pandya": {"team": "Shalini's Strikers", "bat": "18(11) 3x4 0x6", "bowl": "1/39 (3)", "field": "1c", "pts": 126}, "Finn Allen": {"team": "Shalini's Strikers", "bat": "37(17) 6x4 2x6", "bowl": null, "field": null, "pts": 89}, "Cameron Green": {"team": "Ctrl Alt Defeat", "bat": "18(10) 1x4 1x6", "bowl": null, "field": null, "pts": 38}, "Rinku Singh": {"team": "Ctrl Alt Defeat", "bat": "33(21) 4x4 0x6", "bowl": null, "field": "1c", "pts": 69}, "Ajinkya Rahane": {"team": "Zlatan's Team", "bat": "67(40) 3x4 5x6", "bowl": null, "field": null, "pts": 125}, "Jasprit Bumrah": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/35 (4)", "field": null, "pts": 12}, "Varun Chakravarthy": {"team": "Dashboard XI", "bat": null, "bowl": "0/48 (4)", "field": null, "pts": 10}}}, 
+    "3": {"label": "RR vs CSK", "date": "Mar 30", "result": "RR won by 8 wkts", "abandoned": false, "performances": {"Noor Ahmad": {"team": "Dashboard XI", "bat": "1(9) 0x4 0x6", "bowl": "0/24 (2)", "field": null, "pts": 9}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "6(7) 1x4 0x6", "bowl": null, "field": null, "pts": 14}, "Vaibhav Sooryavanshi": {"team": "Shalini's Strikers", "bat": "52(17) 4x4 5x6", "bowl": null, "field": null, "pts": 236}, "Dhruv Jurel": {"team": "Ctrl Alt Defeat", "bat": "18(9) 4x4 0x6", "bowl": null, "field": "2c", "pts": 54}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "0(1) 0x4 0x6", "bowl": null, "field": null, "pts": 2}, "Khaleel Ahmed": {"team": "Dashboard XI", "bat": null, "bowl": "0/17 (3)", "field": null, "pts": 30}, "Shivam Dube": {"team": "Dashboard XI", "bat": "6(4) 0x4 1x6", "bowl": null, "field": null, "pts": 24}, "Yashasvi Jaiswal": {"team": "Shalini's Strikers", "bat": "38(36) 3x4 1x6", "bowl": null, "field": "1c", "pts": 72}, "Ravi Bishnoi": {"team": "Dashboard XI", "bat": null, "bowl": "1/16 (3)", "field": "1c", "pts": 64}, "Riyan Parag": {"team": "Shalini's Strikers", "bat": "14(11) 1x4 1x6", "bowl": null, "field": null, "pts": 28}, "Ravindra Jadeja": {"team": "Zlatan's Team", "bat": null, "bowl": "2/18 (3)", "field": null, "pts": 90}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "6(11) 1x4 0x6", "bowl": null, "field": null, "pts": 8}, "Shimron Hetmyer": {"team": "Zlatan's Team", "bat": null, "bowl": null, "field": "1ro", "pts": 14}}}, 
+    "4": {"label": "PBKS vs GT", "date": "Mar 31", "result": "PBKS won by 3 wkts", "abandoned": false, "performances": {"Mohammed Siraj": {"team": "Dashboard XI", "bat": null, "bowl": "0/15 (2)", "field": null, "pts": 18}, "Shreyas Iyer": {"team": "Zlatan's Team", "bat": "18(11) 0x4 2x6", "bowl": null, "field": "1c", "pts": 92}, "Yuzvendra Chahal": {"team": "Zlatan's Team", "bat": null, "bowl": "2/28 (4)", "field": null, "pts": 86}, "Jos Buttler": {"team": "Shalini's Strikers", "bat": "38(33) 3x4 2x6", "bowl": null, "field": null, "pts": 70}, "Marcus Stoinis": {"team": "Ctrl Alt Defeat", "bat": "0(2) 0x4 0x6", "bowl": null, "field": null, "pts": 2}, "Prabhsimran Singh": {"team": "Zlatan's Team", "bat": "37(24) 1x4 4x6", "bowl": null, "field": null, "pts": 77}, "Shubman Gill": {"team": "Dashboard XI", "bat": "39(27) 6x4 0x6", "bowl": null, "field": "2c", "pts": 89}, "Shashank Singh": {"team": "Ctrl Alt Defeat", "bat": "4(5) 0x4 0x6", "bowl": null, "field": null, "pts": 8}, "Sai Sudharsan": {"team": "Dashboard XI", "bat": "13(11) 2x4 0x6", "bowl": null, "field": null, "pts": 25}, "Marco Jansen": {"team": "Dashboard XI", "bat": "9(10) 0x4 1x6", "bowl": "1/20 (4)", "field": null, "pts": 69}, "Prasidh Krishna": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "3/29 (4)", "field": "1c", "pts": 134}, "Priyansh Arya": {"team": "Zlatan's Team", "bat": "7(8) 0x4 1x6", "bowl": null, "field": null, "pts": 17}, "Rashid Khan": {"team": "Zlatan's Team", "bat": null, "bowl": "1/29 (4)", "field": "1c", "pts": 64}, "Arshdeep Singh": {"team": "Dashboard XI", "bat": null, "bowl": "0/42 (4)", "field": null, "pts": 20}}}, 
+    "5": {"label": "LSG vs DC", "date": "Apr 1", "result": "DC won by 6 wkts", "abandoned": false, "performances": {"Lungi Ngidi": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "3/27 (4)", "field": null, "pts": 126}, "Axar Patel": {"team": "Zlatan's Team", "bat": null, "bowl": "1/18 (3)", "field": null, "pts": 52}, "Mitchell Marsh": {"team": "Dashboard XI", "bat": "35(28) 3x4 1x6", "bowl": null, "field": null, "pts": 61}, "KL Rahul": {"team": "Zlatan's Team", "bat": "2(4) 0x4 0x6", "bowl": null, "field": "1c", "pts": 14}, "Nicholas Pooran": {"team": "Zlatan's Team", "bat": "8(8) 1x4 0x6", "bowl": null, "field": null, "pts": 16}, "Rishabh Pant": {"team": "Zlatan's Team", "bat": "7(9) 1x4 0x6", "bowl": null, "field": null, "pts": 15}, "Kuldeep Yadav": {"team": "Dashboard XI", "bat": null, "bowl": "2/28 (4)", "field": null, "pts": 88}, "Aiden Markram": {"team": "Dashboard XI", "bat": "15(10) 1x4 1x6", "bowl": null, "field": null, "pts": 31}, "Tristan Stubbs": {"team": "Dashboard XI", "bat": "39(32) 3x4 1x6", "bowl": null, "field": "1c", "pts": 73}}}, 
+    "6": {"label": "KKR vs SRH", "date": "Apr 2", "result": "SRH won by 65 runs", "abandoned": false, "performances": {"Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "52(35) 4x4 3x6", "bowl": null, "field": "1c", "pts": 108}, "Angkrish Raghuvanshi": {"team": "Zlatan's Team", "bat": "52(29) 6x4 2x6", "bowl": null, "field": null, "pts": 106}, "Sunil Narine": {"team": "Dashboard XI", "bat": "15(8) 1x4 2x6", "bowl": "0/38 (4)", "field": null, "pts": 47}, "Jaydev Unadkat": {"team": "", "bat": null, "bowl": "3/21 (3)", "field": null, "pts": 122}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "4(5) 0x4 0x6", "bowl": null, "field": "2c", "pts": 36}, "Travis Head": {"team": "Zlatan's Team", "bat": "46(21) 5x4 3x6", "bowl": null, "field": null, "pts": 100}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "30(18) 3x4 2x6", "bowl": null, "field": null, "pts": 66}, "Finn Allen": {"team": "Shalini's Strikers", "bat": "24(8) 3x4 2x6", "bowl": null, "field": null, "pts": 60}, "Cameron Green": {"team": "Ctrl Alt Defeat", "bat": "6(5) 1x4 0x6", "bowl": null, "field": null, "pts": 14}, "Rinku Singh": {"team": "Ctrl Alt Defeat", "bat": "35(25) 3x4 1x6", "bowl": null, "field": null, "pts": 63}, "Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "48(21) 4x4 4x6", "bowl": null, "field": null, "pts": 156}, "Ajinkya Rahane": {"team": "Zlatan's Team", "bat": "10(8) 1x4 0x6", "bowl": null, "field": null, "pts": 18}, "Varun Chakravarthy": {"team": "Dashboard XI", "bat": null, "bowl": "0/42 (3)", "field": null, "pts": 8}}}, 
+    "7": {"label": "CSK vs PBKS", "date": "Apr 3", "result": "PBKS won by 5 wkts", "abandoned": false, "performances": {"Shreyas Iyer": {"team": "Zlatan's Team", "bat": "50(29) 4x4 3x6", "bowl": null, "field": null, "pts": 204}, "Noor Ahmad": {"team": "Dashboard XI", "bat": null, "bowl": "1/45 (4)", "field": null, "pts": 40}, "Yuzvendra Chahal": {"team": "Zlatan's Team", "bat": null, "bowl": "1/35 (4)", "field": null, "pts": 46}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "73(43) 6x4 5x6", "bowl": null, "field": null, "pts": 143}, "Khaleel Ahmed": {"team": "Dashboard XI", "bat": null, "bowl": "0/40 (4)", "field": null, "pts": 18}, "Prabhsimran Singh": {"team": "Zlatan's Team", "bat": "43(30) 3x4 2x6", "bowl": null, "field": null, "pts": 77}, "Shashank Singh": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": null, "pts": 4}, "Shivam Dube": {"team": "Dashboard XI", "bat": "45(27) 3x4 3x6", "bowl": null, "field": "1c", "pts": 142}, "Marcus Stoinis": {"team": "Ctrl Alt Defeat", "bat": "8(4) 1x4 0x6", "bowl": "0/22 (2)", "field": null, "pts": 20}, "Marco Jansen": {"team": "Dashboard XI", "bat": null, "bowl": "1/42 (4)", "field": null, "pts": 46}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "7(5) 1x4 0x6", "bowl": null, "field": "1c", "pts": 23}, "Priyansh Arya": {"team": "Zlatan's Team", "bat": "39(11) 5x4 3x6", "bowl": null, "field": null, "pts": 93}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "28(22) 2x4 0x6", "bowl": null, "field": null, "pts": 44}, "Arshdeep Singh": {"team": "Dashboard XI", "bat": null, "bowl": "1/38 (4)", "field": null, "pts": 50}}}, 
+    "8": {"label": "DC vs MI", "date": "Apr 4", "result": "DC won by 6 wkts", "abandoned": false, "performances": {"Mitchell Santner": {"team": "Shalini's Strikers", "bat": "28(18) 2x4 2x6", "bowl": "1/35 (4)", "field": null, "pts": 108}, "Tilak Varma": {"team": "Zlatan's Team", "bat": "6(8) 0x4 0x6", "bowl": null, "field": null, "pts": 10}, "Lungi Ngidi": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "0/32 (4)", "field": null, "pts": 24}, "Suryakumar Yadav": {"team": "Shalini's Strikers", "bat": "51(36) 3x4 2x6", "bowl": null, "field": null, "pts": 89}, "KL Rahul": {"team": "Zlatan's Team", "bat": "1(4) 0x4 0x6", "bowl": null, "field": "1c", "pts": 13}, "Axar Patel": {"team": "Zlatan's Team", "bat": "10(8) 1x4 0x6", "bowl": "1/22 (4)", "field": null, "pts": 74}, "Rohit Sharma": {"team": "Ctrl Alt Defeat", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Kuldeep Yadav": {"team": "Dashboard XI", "bat": null, "bowl": "1/28 (4)", "field": null, "pts": 60}, "Sherfane Rutherford": {"team": "Ctrl Alt Defeat", "bat": "5(6) 0x4 0x6", "bowl": null, "field": null, "pts": 9}, "Trent Boult": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/35 (4)", "field": null, "pts": 20}, "Tristan Stubbs": {"team": "Dashboard XI", "bat": "20(18) 1x4 1x6", "bowl": null, "field": null, "pts": 34}, "Ryan Rickelton": {"team": "Ctrl Alt Defeat", "bat": "18(14) 2x4 0x6", "bowl": null, "field": null, "pts": 30}, "Jasprit Bumrah": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/30 (4)", "field": null, "pts": 30}}}, 
+    "9": {"label": "GT vs RR", "date": "Apr 4", "result": "RR won by 6 runs", "abandoned": false, "performances": {"Mohammed Siraj": {"team": "Dashboard XI", "bat": null, "bowl": "1/35 (4)", "field": null, "pts": 50}, "Jos Buttler": {"team": "Shalini's Strikers", "bat": "25(20) 2x4 1x6", "bowl": null, "field": null, "pts": 47}, "Vaibhav Sooryavanshi": {"team": "Shalini's Strikers", "bat": "22(12) 2x4 2x6", "bowl": null, "field": null, "pts": 104}, "Dhruv Jurel": {"team": "Ctrl Alt Defeat", "bat": "12(8) 1x4 0x6", "bowl": null, "field": "1c", "pts": 28}, "Shubman Gill": {"team": "Dashboard XI", "bat": "45(30) 4x4 2x6", "bowl": null, "field": null, "pts": 83}, "Sai Sudharsan": {"team": "Dashboard XI", "bat": "62(40) 5x4 2x6", "bowl": null, "field": null, "pts": 110}, "Yashasvi Jaiswal": {"team": "Shalini's Strikers", "bat": "58(35) 5x4 3x6", "bowl": null, "field": null, "pts": 112}, "Ravi Bishnoi": {"team": "Dashboard XI", "bat": null, "bowl": "4/30 (4)", "field": null, "pts": 162}, "Prasidh Krishna": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "1/32 (4)", "field": null, "pts": 54}, "Riyan Parag": {"team": "Shalini's Strikers", "bat": "40(28) 3x4 2x6", "bowl": null, "field": null, "pts": 74}, "Ravindra Jadeja": {"team": "Zlatan's Team", "bat": null, "bowl": "0/32 (4)", "field": null, "pts": 20}, "Rashid Khan": {"team": "Zlatan's Team", "bat": null, "bowl": "1/28 (4)", "field": null, "pts": 58}, "Shimron Hetmyer": {"team": "Zlatan's Team", "bat": "18(10) 1x4 1x6", "bowl": null, "field": null, "pts": 38}}}, 
+    "10": {"label": "SRH vs LSG", "date": "Apr 5", "result": "LSG won by 5 wkts", "abandoned": false, "performances": {"Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "38(25) 3x4 2x6", "bowl": null, "field": null, "pts": 74}, "Jaydev Unadkat": {"team": "", "bat": null, "bowl": "2/30 (4)", "field": null, "pts": 84}, "Mitchell Marsh": {"team": "Dashboard XI", "bat": "42(28) 4x4 2x6", "bowl": null, "field": null, "pts": 80}, "Nicholas Pooran": {"team": "Zlatan's Team", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "18(14) 2x4 0x6", "bowl": null, "field": "1c/1st", "pts": 75}, "Travis Head": {"team": "Zlatan's Team", "bat": "30(22) 3x4 1x6", "bowl": null, "field": null, "pts": 58}, "Rishabh Pant": {"team": "Zlatan's Team", "bat": "45(36) 4x4 1x6", "bowl": null, "field": "1st", "pts": 87}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "22(16) 2x4 1x6", "bowl": "1/28 (3)", "field": null, "pts": 86}, "Aiden Markram": {"team": "Dashboard XI", "bat": "28(20) 2x4 1x6", "bowl": null, "field": null, "pts": 52}, "Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "28(18) 3x4 1x6", "bowl": null, "field": null, "pts": 87}, "Liam Livingstone": {"team": "Shalini's Strikers", "bat": "10(8) 1x4 0x6", "bowl": null, "field": null, "pts": 18}}}, 
+    "11": {"label": "RCB vs CSK", "date": "Apr 5", "result": "RCB won by 50 runs", "abandoned": false, "performances": {"Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": "1st", "pts": 16}, "Noor Ahmad": {"team": "Dashboard XI", "bat": null, "bowl": "0/48 (4)", "field": null, "pts": 8}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "50(29) 5x4 2x6", "bowl": null, "field": "2c", "pts": 116}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": null, "bowl": "2/32 (4)", "field": null, "pts": 82}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "28(18) 3x4 1x6", "bowl": null, "field": null, "pts": 116}, "Phil Salt": {"team": "Dashboard XI", "bat": "46(30) 5x4 2x6", "bowl": null, "field": null, "pts": 180}, "Tim David": {"team": "Dashboard XI", "bat": "70(25) 3x4 8x6", "bowl": null, "field": null, "pts": 150}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": null, "bowl": "3/35 (4)", "field": null, "pts": 122}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "1(3) 0x4 0x6", "bowl": null, "field": null, "pts": 5}, "Khaleel Ahmed": {"team": "Dashboard XI", "bat": null, "bowl": "0/37 (4)", "field": null, "pts": 18}, "Shivam Dube": {"team": "Dashboard XI", "bat": "22(16) 2x4 1x6", "bowl": "2/35 (3)", "field": null, "pts": 162}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": null, "bowl": null, "field": null, "pts": 4}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "9(5) 0x4 1x6", "bowl": null, "field": null, "pts": 19}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "7(5) 1x4 0x6", "bowl": null, "field": null, "pts": 15}}}, 
+    "12": {"label": "KKR vs PBKS", "date": "Apr 6", "result": "Abandoned (rain)", "abandoned": true, "performances": {}}, 
+    "13": {"label": "RR vs MI", "date": "Apr 7", "result": "RR won by 27 runs (11-over)", "abandoned": false, "performances": {"Ravindra Jadeja": {"team": "Zlatan's Team", "bat": null, "bowl": "0/12 (2)", "field": null, "pts": 18}, "Tilak Varma": {"team": "Zlatan's Team", "bat": "18(12) 2x4 0x6", "bowl": null, "field": "2c", "pts": 48}, "Vaibhav Sooryavanshi": {"team": "Shalini's Strikers", "bat": "39(14) 3x4 4x6", "bowl": null, "field": null, "pts": 182}, "Dhruv Jurel": {"team": "Ctrl Alt Defeat", "bat": "4(5) 0x4 0x6", "bowl": null, "field": null, "pts": 8}, "Suryakumar Yadav": {"team": "Shalini's Strikers", "bat": "10(7) 1x4 0x6", "bowl": null, "field": null, "pts": 18}, "Rohit Sharma": {"team": "Ctrl Alt Defeat", "bat": "15(10) 2x4 0x6", "bowl": null, "field": null, "pts": 29}, "Sherfane Rutherford": {"team": "Ctrl Alt Defeat", "bat": "25(8) 1x4 2x6", "bowl": null, "field": "1c", "pts": 65}, "Trent Boult": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/22 (2)", "field": null, "pts": 12}, "Yashasvi Jaiswal": {"team": "Shalini's Strikers", "bat": "77(32) 10x4 4x6", "bowl": null, "field": null, "pts": 165}, "Hardik Pandya": {"team": "Shalini's Strikers", "bat": "8(6) 0x4 1x6", "bowl": "0/17 (2)", "field": null, "pts": 39}, "Ravi Bishnoi": {"team": "Dashboard XI", "bat": null, "bowl": "2/25 (2)", "field": null, "pts": 66}, "Riyan Parag": {"team": "Shalini's Strikers", "bat": "20(9) 1x4 2x6", "bowl": null, "field": null, "pts": 48}, "Ryan Rickelton": {"team": "Ctrl Alt Defeat", "bat": "8(5) 1x4 0x6", "bowl": null, "field": null, "pts": 16}, "Jasprit Bumrah": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/32 (3)", "field": null, "pts": 20}, "Shimron Hetmyer": {"team": "Zlatan's Team", "bat": "5(3) 0x4 0x6", "bowl": null, "field": null, "pts": 9}}}, 
+    "14": {"label": "DC vs GT", "date": "Apr 8", "result": "GT won by 1 run", "abandoned": false, "performances": {"Mohammed Siraj": {"team": "Dashboard XI", "bat": null, "bowl": "1/52 (4)", "field": null, "pts": 40}, "Jos Buttler": {"team": "Shalini's Strikers", "bat": "52(27) 3x4 5x6", "bowl": null, "field": null, "pts": 114}, "Lungi Ngidi": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "1/24 (4)", "field": null, "pts": 62}, "Axar Patel": {"team": "Zlatan's Team", "bat": "2(3) 0x4 0x6", "bowl": "0/34 (4)", "field": null, "pts": 20}, "KL Rahul": {"team": "Zlatan's Team", "bat": "92(52) 11x4 4x6", "bowl": null, "field": "1c", "pts": 190}, "David Miller": {"team": "Ctrl Alt Defeat", "bat": "41(20) 3x4 3x6", "bowl": null, "field": null, "pts": 87}, "Kuldeep Yadav": {"team": "Dashboard XI", "bat": null, "bowl": "0/38 (4)", "field": null, "pts": 22}, "Shubman Gill": {"team": "Dashboard XI", "bat": "70(45) 4x4 5x6", "bowl": null, "field": null, "pts": 132}, "Sai Sudharsan": {"team": "Dashboard XI", "bat": "15(12) 1x4 0x6", "bowl": null, "field": null, "pts": 23}, "Tristan Stubbs": {"team": "Dashboard XI", "bat": "7(6) 0x4 1x6", "bowl": null, "field": null, "pts": 17}, "Prasidh Krishna": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "2/52 (4)", "field": null, "pts": 72}, "Rashid Khan": {"team": "Zlatan's Team", "bat": null, "bowl": "3/17 (4)", "field": null, "pts": 138}}}, 
+    "15": {"label": "KKR vs LSG", "date": "Apr 9", "result": "LSG won by 3 wkts", "abandoned": false, "performances": {"Angkrish Raghuvanshi": {"team": "Zlatan's Team", "bat": "55(30) 4x4 3x6", "bowl": null, "field": null, "pts": 107}, "Varun Chakravarthy": {"team": "Dashboard XI", "bat": null, "bowl": "2/35 (4)", "field": null, "pts": 82}, "Mitchell Marsh": {"team": "Dashboard XI", "bat": "42(28) 4x4 2x6", "bowl": null, "field": null, "pts": 80}, "Nicholas Pooran": {"team": "Zlatan's Team", "bat": "19(12) 1x4 1x6", "bowl": null, "field": null, "pts": 37}, "Rishabh Pant": {"team": "Zlatan's Team", "bat": "25(18) 2x4 1x6", "bowl": null, "field": "1st", "pts": 61}, "Rovman Powell": {"team": "Shalini's Strikers", "bat": "39(24) 2x4 3x6", "bowl": null, "field": null, "pts": 77}, "Finn Allen": {"team": "Shalini's Strikers", "bat": "12(8) 1x4 1x6", "bowl": null, "field": null, "pts": 26}, "Cameron Green": {"team": "Ctrl Alt Defeat", "bat": "5(5) 1x4 0x6", "bowl": null, "field": null, "pts": 13}, "Rinku Singh": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": null, "pts": 4}, "Aiden Markram": {"team": "Dashboard XI", "bat": "30(21) 2x4 2x6", "bowl": null, "field": null, "pts": 60}, "Ajinkya Rahane": {"team": "Zlatan's Team", "bat": "41(24) 3x4 3x6", "bowl": null, "field": null, "pts": 85}, "Sunil Narine": {"team": "Dashboard XI", "bat": null, "bowl": "0/32 (4)", "field": null, "pts": 20}}}, 
+    "16": {"label": "RR vs RCB", "date": "Apr 10", "result": "RR won by 6 wkts", "abandoned": false, "performances": {"Vaibhav Sooryavanshi": {"team": "Shalini's Strikers", "bat": "78(26) 6x4 7x6", "bowl": null, "field": null, "pts": 336}, "Dhruv Jurel": {"team": "Ctrl Alt Defeat", "bat": "50(30) 5x4 2x6", "bowl": null, "field": null, "pts": 98}, "Phil Salt": {"team": "Dashboard XI", "bat": "45(28) 5x4 2x6", "bowl": null, "field": null, "pts": 178}, "Tim David": {"team": "Dashboard XI", "bat": "20(12) 1x4 2x6", "bowl": null, "field": null, "pts": 44}, "Shimron Hetmyer": {"team": "Zlatan's Team", "bat": null, "bowl": null, "field": null, "pts": 4}, "Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": "1c", "pts": 12}, "Venkatesh Iyer": {"team": "Ctrl Alt Defeat", "bat": "15(11) 1x4 1x6", "bowl": null, "field": null, "pts": 31}, "Ravindra Jadeja": {"team": "Zlatan's Team", "bat": "25(15) 2x4 2x6", "bowl": "0/28 (2)", "field": null, "pts": 57}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "30(20) 3x4 1x6", "bowl": null, "field": null, "pts": 58}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": null, "bowl": "1/35 (4)", "field": null, "pts": 48}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "49(29) 4x4 2x6", "bowl": null, "field": null, "pts": 178}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": null, "bowl": "0/37 (4)", "field": null, "pts": 20}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": null, "bowl": "2/35 (4)", "field": null, "pts": 82}, "Yashasvi Jaiswal": {"team": "Shalini's Strikers", "bat": "43(28) 4x4 2x6", "bowl": null, "field": null, "pts": 83}, "Riyan Parag": {"team": "Shalini's Strikers", "bat": null, "bowl": null, "field": "2c", "pts": 20}, "Ravi Bishnoi": {"team": "Dashboard XI", "bat": null, "bowl": "2/30 (4)", "field": null, "pts": 86}}}, 
+    "17": {"label": "PBKS vs SRH", "date": "Apr 11", "result": "PBKS won by 6 wkts", "abandoned": false, "performances": {"Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "55(30) 4x4 3x6", "bowl": null, "field": null, "pts": 107}, "Shreyas Iyer": {"team": "Zlatan's Team", "bat": "60(33) 4x4 4x6", "bowl": null, "field": null, "pts": 236}, "Yuzvendra Chahal": {"team": "Zlatan's Team", "bat": null, "bowl": "1/40 (4)", "field": null, "pts": 52}, "Jaydev Unadkat": {"team": "", "bat": null, "bowl": "2/38 (4)", "field": null, "pts": 80}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "22(14) 2x4 1x6", "bowl": null, "field": "1c/1st", "pts": 96}, "Travis Head": {"team": "Zlatan's Team", "bat": "30(18) 3x4 2x6", "bowl": null, "field": null, "pts": 66}, "Marcus Stoinis": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": null, "pts": 4}, "Prabhsimran Singh": {"team": "Zlatan's Team", "bat": "50(30) 5x4 2x6", "bowl": null, "field": null, "pts": 98}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "20(12) 1x4 1x6", "bowl": "0/25 (2)", "field": null, "pts": 40}, "Marco Jansen": {"team": "Dashboard XI", "bat": null, "bowl": "1/45 (4)", "field": null, "pts": 46}, "Shashank Singh": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": null, "pts": 4}, "Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "74(28) 5x4 8x6", "bowl": null, "field": null, "pts": 243}, "Priyansh Arya": {"team": "Zlatan's Team", "bat": "39(11) 3x4 4x6", "bowl": null, "field": null, "pts": 91}, "Liam Livingstone": {"team": "Shalini's Strikers", "bat": "15(10) 1x4 1x6", "bowl": null, "field": null, "pts": 31}, "Arshdeep Singh": {"team": "Dashboard XI", "bat": null, "bowl": "2/35 (4)", "field": null, "pts": 82}}}, 
+    "18": {"label": "CSK vs DC", "date": "Apr 11", "result": "CSK won by 23 runs", "abandoned": false, "performances": {"Noor Ahmad": {"team": "Dashboard XI", "bat": null, "bowl": "1/38 (4)", "field": null, "pts": 50}, "Lungi Ngidi": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "0/42 (4)", "field": null, "pts": 16}, "Axar Patel": {"team": "Zlatan's Team", "bat": "25(18) 2x4 1x6", "bowl": "0/35 (4)", "field": null, "pts": 65}, "KL Rahul": {"team": "Zlatan's Team", "bat": "45(30) 4x4 2x6", "bowl": null, "field": "1st", "pts": 95}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "59(30) 5x4 3x6", "bowl": null, "field": null, "pts": 117}, "Khaleel Ahmed": {"team": "Dashboard XI", "bat": null, "bowl": "1/30 (4)", "field": null, "pts": 54}, "Kuldeep Yadav": {"team": "Dashboard XI", "bat": null, "bowl": "1/40 (4)", "field": null, "pts": 52}, "Dewald Brevis": {"team": "Shalini's Strikers", "bat": "22(14) 2x4 1x6", "bowl": null, "field": null, "pts": 44}, "Shivam Dube": {"team": "Dashboard XI", "bat": "8(6) 0x4 1x6", "bowl": null, "field": null, "pts": 27}, "Tristan Stubbs": {"team": "Dashboard XI", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Ashutosh Sharma": {"team": "Ctrl Alt Defeat", "bat": "19(10) 1x4 2x6", "bowl": null, "field": null, "pts": 45}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "115(56) 15x4 4x6", "bowl": null, "field": null, "pts": 227}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "15(12) 2x4 0x6", "bowl": null, "field": null, "pts": 27}}}, 
+    "19": {"label": "LSG vs GT", "date": "Apr 12", "result": "GT won by 7 wkts", "abandoned": false, "performances": {"Mohammed Siraj": {"team": "Dashboard XI", "bat": null, "bowl": "1/28 (3)", "field": null, "pts": 48}, "Jos Buttler": {"team": "Shalini's Strikers", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Mitchell Marsh": {"team": "Dashboard XI", "bat": "30(22) 3x4 1x6", "bowl": null, "field": null, "pts": 58}, "Nicholas Pooran": {"team": "Zlatan's Team", "bat": "19(14) 1x4 1x6", "bowl": null, "field": null, "pts": 35}, "Rishabh Pant": {"team": "Zlatan's Team", "bat": "22(18) 2x4 0x6", "bowl": null, "field": "1st", "pts": 46}, "Shubman Gill": {"team": "Dashboard XI", "bat": "65(40) 5x4 3x6", "bowl": null, "field": null, "pts": 119}, "Sai Sudharsan": {"team": "Dashboard XI", "bat": "30(22) 3x4 1x6", "bowl": null, "field": null, "pts": 58}, "Aiden Markram": {"team": "Dashboard XI", "bat": "25(20) 2x4 1x6", "bowl": null, "field": null, "pts": 47}, "Prasidh Krishna": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "0/30 (3)", "field": null, "pts": 18}, "Rashid Khan": {"team": "Zlatan's Team", "bat": null, "bowl": "2/20 (4)", "field": null, "pts": 94}}}, 
+    "20": {"label": "MI vs RCB", "date": "Apr 12", "result": "RCB won by 18 runs", "abandoned": false, "performances": {"Tilak Varma": {"team": "Zlatan's Team", "bat": "18(14) 2x4 0x6", "bowl": null, "field": "1c", "pts": 38}, "Phil Salt": {"team": "Dashboard XI", "bat": "78(36) 6x4 6x6", "bowl": null, "field": null, "pts": 324}, "Tim David": {"team": "Dashboard XI", "bat": "34(16) 2x4 3x6", "bowl": null, "field": null, "pts": 76}, "Rohit Sharma": {"team": "Ctrl Alt Defeat", "bat": "62(32) 6x4 4x6", "bowl": null, "field": null, "pts": 130}, "Sherfane Rutherford": {"team": "Ctrl Alt Defeat", "bat": "12(8) 1x4 1x6", "bowl": null, "field": null, "pts": 26}, "Ryan Rickelton": {"team": "Ctrl Alt Defeat", "bat": "45(28) 5x4 2x6", "bowl": null, "field": null, "pts": 89}, "Jasprit Bumrah": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/35 (4)", "field": null, "pts": 24}, "Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": "1c", "pts": 12}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "55(30) 5x4 3x6", "bowl": null, "field": null, "pts": 111}, "Mitchell Santner": {"team": "Shalini's Strikers", "bat": null, "bowl": "1/43 (4)", "field": null, "pts": 44}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": null, "bowl": "1/26 (4)", "field": null, "pts": 56}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "45(28) 4x4 2x6", "bowl": null, "field": null, "pts": 170}, "Suryakumar Yadav": {"team": "Shalini's Strikers", "bat": "33(22) 3x4 1x6", "bowl": null, "field": null, "pts": 61}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": null, "bowl": "2/38 (4)", "field": null, "pts": 80}, "Trent Boult": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/42 (4)", "field": null, "pts": 16}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": null, "bowl": "1/40 (4)", "field": null, "pts": 48}, "Hardik Pandya": {"team": "Shalini's Strikers", "bat": "40(20) 6x4 1x6", "bowl": "0/39 (4)", "field": null, "pts": 144}}}, 
+    "21": {"label": "SRH vs RR", "date": "Apr 13", "result": "SRH won by 57 runs", "abandoned": false, "performances": {"Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "70(38) 6x4 4x6", "bowl": null, "field": null, "pts": 136}, "Jaydev Unadkat": {"team": "", "bat": null, "bowl": "2/28 (4)", "field": null, "pts": 86}, "Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "55(28) 4x4 5x6", "bowl": null, "field": null, "pts": 182}, "Vaibhav Sooryavanshi": {"team": "Shalini's Strikers", "bat": "25(14) 2x4 2x6", "bowl": null, "field": null, "pts": 118}, "Dhruv Jurel": {"team": "Ctrl Alt Defeat", "bat": "22(16) 2x4 0x6", "bowl": null, "field": null, "pts": 36}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "15(10) 1x4 1x6", "bowl": null, "field": "1c/1st", "pts": 76}, "Travis Head": {"team": "Zlatan's Team", "bat": "40(22) 4x4 2x6", "bowl": null, "field": null, "pts": 82}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "25(16) 2x4 1x6", "bowl": "1/22 (3)", "field": null, "pts": 97}, "Yashasvi Jaiswal": {"team": "Shalini's Strikers", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Ravi Bishnoi": {"team": "Dashboard XI", "bat": null, "bowl": "2/38 (4)", "field": null, "pts": 82}, "Riyan Parag": {"team": "Shalini's Strikers", "bat": "28(20) 2x4 1x6", "bowl": null, "field": null, "pts": 52}, "Ravindra Jadeja": {"team": "Zlatan's Team", "bat": "8(7) 1x4 0x6", "bowl": "1/32 (4)", "field": null, "pts": 64}, "Liam Livingstone": {"team": "Shalini's Strikers", "bat": "20(12) 2x4 1x6", "bowl": null, "field": null, "pts": 42}, "Shimron Hetmyer": {"team": "Zlatan's Team", "bat": "10(8) 1x4 0x6", "bowl": null, "field": null, "pts": 18}}}, 
+    "22": {"label": "CSK vs KKR", "date": "Apr 14", "result": "CSK won by 35 runs", "abandoned": false, "performances": {"Angkrish Raghuvanshi": {"team": "Zlatan's Team", "bat": "50(32) 4x4 2x6", "bowl": null, "field": null, "pts": 94}, "Noor Ahmad": {"team": "Dashboard XI", "bat": null, "bowl": "2/30 (4)", "field": null, "pts": 84}, "Sunil Narine": {"team": "Dashboard XI", "bat": null, "bowl": "1/28 (4)", "field": null, "pts": 56}, "Rovman Powell": {"team": "Shalini's Strikers", "bat": "28(15) 2x4 2x6", "bowl": null, "field": null, "pts": 62}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "45(28) 4x4 2x6", "bowl": null, "field": null, "pts": 85}, "Khaleel Ahmed": {"team": "Dashboard XI", "bat": null, "bowl": "2/28 (4)", "field": null, "pts": 88}, "Dewald Brevis": {"team": "Shalini's Strikers", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Shivam Dube": {"team": "Dashboard XI", "bat": "13(8) 1x4 1x6", "bowl": null, "field": null, "pts": 40}, "Finn Allen": {"team": "Shalini's Strikers", "bat": "8(6) 1x4 0x6", "bowl": null, "field": null, "pts": 16}, "Rinku Singh": {"team": "Ctrl Alt Defeat", "bat": "22(15) 2x4 1x6", "bowl": null, "field": null, "pts": 42}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "70(38) 8x4 3x6", "bowl": null, "field": "1c", "pts": 146}, "Ajinkya Rahane": {"team": "Zlatan's Team", "bat": "41(24) 3x4 2x6", "bowl": null, "field": null, "pts": 79}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "20(14) 2x4 0x6", "bowl": null, "field": null, "pts": 34}, "Varun Chakravarthy": {"team": "Dashboard XI", "bat": null, "bowl": "2/35 (4)", "field": null, "pts": 84}}}, 
+    "23": {"label": "RCB vs LSG", "date": "Apr 15", "result": "RCB won by 5 wkts", "abandoned": false, "performances": {"Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": null, "field": "1c", "pts": 12}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "25(18) 3x4 0x6", "bowl": null, "field": null, "pts": 47}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": null, "bowl": "1/22 (3)", "field": null, "pts": 50}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "49(35) 5x4 1x6", "bowl": null, "field": null, "pts": 170}, "Phil Salt": {"team": "Dashboard XI", "bat": "40(22) 4x4 2x6", "bowl": null, "field": null, "pts": 164}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": null, "bowl": "3/28 (4)", "field": null, "pts": 128}, "Mitchell Marsh": {"team": "Dashboard XI", "bat": "35(22) 3x4 2x6", "bowl": null, "field": null, "pts": 71}, "Nicholas Pooran": {"team": "Zlatan's Team", "bat": "18(14) 2x4 0x6", "bowl": null, "field": null, "pts": 30}, "Rishabh Pant": {"team": "Zlatan's Team", "bat": "28(22) 2x4 1x6", "bowl": null, "field": "1st", "pts": 62}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": null, "bowl": null, "field": null, "pts": 4}, "Aiden Markram": {"team": "Dashboard XI", "bat": "30(24) 3x4 0x6", "bowl": null, "field": null, "pts": 50}}}, 
+    "24": {"label": "MI vs PBKS", "date": "Apr 16", "result": "PBKS won by 7 wkts", "abandoned": false, "performances": {"Shreyas Iyer": {"team": "Zlatan's Team", "bat": "66(35) 5x4 4x6", "bowl": null, "field": "1c", "pts": 196}, "Ryan Rickelton": {"team": "Ctrl Alt Defeat", "bat": "2(8) 0x4 0x6", "bowl": null, "field": null, "pts": 6}, "Tilak Varma": {"team": "Zlatan's Team", "bat": "8(3) 2x4 0x6", "bowl": null, "field": null, "pts": 14}, "Suryakumar Yadav": {"team": "Shalini's Strikers", "bat": "0(1) 0x4 0x6", "bowl": null, "field": null, "pts": 0}, "Marcus Stoinis": {"team": "Ctrl Alt Defeat", "bat": "10(5) 2x4 0x6", "bowl": null, "field": null, "pts": 16}, "Prabhsimran Singh": {"team": "Zlatan's Team", "bat": "80(39) 11x4 2x6", "bowl": null, "field": null, "pts": 118}, "Shashank Singh": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "1/19 (1)", "field": "1c", "pts": 38}, "Sherfane Rutherford": {"team": "Ctrl Alt Defeat", "bat": "1(5) 0x4 0x6", "bowl": null, "field": null, "pts": 5}, "Quinton de Kock": {"team": "Zlatan's Team", "bat": "112(60) 8x4 7x6", "bowl": null, "field": null, "pts": 158}, "Hardik Pandya": {"team": "Shalini's Strikers", "bat": "14(12) 0x4 1x6", "bowl": "0/39 (3)", "field": null, "pts": 24}, "Marco Jansen": {"team": "Dashboard XI", "bat": null, "bowl": "1/30 (4)", "field": null, "pts": 32}, "Priyansh Arya": {"team": "Zlatan's Team", "bat": "15(9) 2x4 1x6", "bowl": null, "field": null, "pts": 25}, "Jasprit Bumrah": {"team": "Shalini's Strikers", "bat": null, "bowl": "0/41 (4)", "field": null, "pts": 4}, "Arshdeep Singh": {"team": "Dashboard XI", "bat": null, "bowl": "3/22 (4)", "field": null, "pts": 90}, "Yuzvendra Chahal": {"team": "Zlatan's Team", "bat": null, "bowl": "0/45 (3)", "field": null, "pts": 4}}}, 
+    "25": {"label": "GT vs KKR", "date": "Apr 17", "result": "GT won by 5 wkts", "abandoned": false, "performances": {"Mohammed Siraj": {"team": "Dashboard XI", "bat": null, "bowl": "2/23 (4)", "field": null, "pts": 64}, "Angkrish Raghuvanshi": {"team": "Zlatan's Team", "bat": "8(4) 2x4 0x6", "bowl": null, "field": null, "pts": 14}, "Jos Buttler": {"team": "Shalini's Strikers", "bat": "25(15) 2x4 2x6", "bowl": null, "field": null, "pts": 38}, "Varun Chakravarthy": {"team": "Dashboard XI", "bat": "0(0) 0x4 0x6", "bowl": "2/34 (4)", "field": null, "pts": 58}, "Rovman Powell": {"team": "Shalini's Strikers", "bat": "27(20) 2x4 2x6", "bowl": null, "field": null, "pts": 40}, "Shubman Gill": {"team": "Dashboard XI", "bat": "86(50) 8x4 4x6", "bowl": null, "field": null, "pts": 126}, "Cameron Green": {"team": "Ctrl Alt Defeat", "bat": "79(55) 7x4 4x6", "bowl": null, "field": null, "pts": 110}, "Sai Sudharsan": {"team": "Dashboard XI", "bat": "22(16) 1x4 2x6", "bowl": null, "field": null, "pts": 34}, "Rinku Singh": {"team": "Ctrl Alt Defeat", "bat": "1(2) 0x4 0x6", "bowl": null, "field": null, "pts": 5}, "Prasidh Krishna": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "1/32 (4)", "field": null, "pts": 33}, "Ajinkya Rahane": {"team": "Zlatan's Team", "bat": "0(1) 0x4 0x6", "bowl": null, "field": null, "pts": 0}, "Rashid Khan": {"team": "Zlatan's Team", "bat": null, "bowl": "1/44 (4)", "field": null, "pts": 29}, "Sunil Narine": {"team": "Dashboard XI", "bat": "0(5) 0x4 0x6", "bowl": "1/28 (4)", "field": null, "pts": 33}}}, 
+    "26": {"label": "RCB vs DC", "date": "Apr 18", "result": "DC won by 6 wkts", "abandoned": false, "performances": {"Jitesh Sharma": {"team": "Ctrl Alt Defeat", "bat": "14(20) 1x4 0x6", "bowl": null, "field": "1c", "pts": 27}, "Devdutt Padikkal": {"team": "Ctrl Alt Defeat", "bat": "18(13) 1x4 1x6", "bowl": null, "field": null, "pts": 27}, "Lungi Ngidi": {"team": "Ctrl Alt Defeat", "bat": null, "bowl": "2/39 (4)", "field": null, "pts": 54}, "Krunal Pandya": {"team": "Zlatan's Team", "bat": "12(10) 0x4 1x6", "bowl": "1/24 (4)", "field": null, "pts": 45}, "Axar Patel": {"team": "Zlatan's Team", "bat": "26(19) 3x4 0x6", "bowl": "2/18 (3)", "field": null, "pts": 87}, "Virat Kohli": {"team": "Ctrl Alt Defeat", "bat": "19(13) 3x4 0x6", "bowl": null, "field": "1c", "pts": 72}, "Phil Salt": {"team": "Dashboard XI", "bat": "63(38) 4x4 3x6", "bowl": null, "field": "1c", "pts": 194}, "Tim David": {"team": "Dashboard XI", "bat": "26(17) 3x4 1x6", "bowl": null, "field": null, "pts": 39}, "Bhuvneshwar Kumar": {"team": "Zlatan's Team", "bat": "3(2) 0x4 0x6", "bowl": "3/26 (4)", "field": null, "pts": 96}, "KL Rahul": {"team": "Zlatan's Team", "bat": "57(34) 6x4 2x6", "bowl": null, "field": null, "pts": 83}, "Kuldeep Yadav": {"team": "Dashboard XI", "bat": null, "bowl": "2/32 (4)", "field": null, "pts": 62}, "Romario Shepherd": {"team": "Shalini's Strikers", "bat": "1(4) 0x4 0x6", "bowl": "0/17 (0.5)", "field": null, "pts": 5}, "Tristan Stubbs": {"team": "Dashboard XI", "bat": "60(47) 4x4 1x6", "bowl": null, "field": "1c", "pts": 86}, "David Miller": {"team": "Ctrl Alt Defeat", "bat": "22(10) 1x4 2x6", "bowl": null, "field": "2c", "pts": 53}}}, 
+    "27": {"label": "SRH vs CSK", "date": "Apr 18", "result": "SRH won by 10 runs", "abandoned": false, "performances": {"Abhishek Sharma": {"team": "Ctrl Alt Defeat", "bat": "59(22) 6x4 4x6", "bowl": "0/13 (1)", "field": null, "pts": 128}, "Travis Head": {"team": "Zlatan's Team", "bat": "23(20) 3x4 1x6", "bowl": null, "field": null, "pts": 32}, "Ishan Kishan": {"team": "Zlatan's Team", "bat": "0(1) 0x4 0x6", "bowl": null, "field": null, "pts": 3}, "Heinrich Klaasen": {"team": "Shalini's Strikers", "bat": "59(39) 6x4 2x6", "bowl": null, "field": "2c", "pts": 101}, "Nitish Kumar Reddy": {"team": "Dashboard XI", "bat": "12(8) 0x4 1x6", "bowl": "2/31 (4)", "field": null, "pts": 68}, "Liam Livingstone": {"team": "Shalini's Strikers", "bat": "1(5) 0x4 0x6", "bowl": null, "field": "2c", "pts": 15}, "Sanju Samson": {"team": "Shalini's Strikers", "bat": "7(3) 0x4 1x6", "bowl": null, "field": "1c", "pts": 27}, "Ruturaj Gaikwad": {"team": "Ctrl Alt Defeat", "bat": "19(13) 3x4 0x6", "bowl": null, "field": "2c", "pts": 44}, "Ayush Mhatre": {"team": "Dashboard XI", "bat": "30(13) 5x4 1x6", "bowl": null, "field": null, "pts": 51}, "Dewald Brevis": {"team": "Shalini's Strikers", "bat": "0(4) 0x4 0x6", "bowl": null, "field": "2c", "pts": 18}, "Shivam Dube": {"team": "Dashboard XI", "bat": "21(16) 1x4 1x6", "bowl": null, "field": null, "pts": 45}, "Noor Ahmad": {"team": "Dashboard XI", "bat": "1(1) 0x4 0x6", "bowl": "0/33 (4)", "field": "1c", "pts": 13}}}
+  },
+  "team_players": {
+    "Ctrl Alt Defeat": ["Rinku Singh", "David Miller", "Mitchell Starc", "Virat Kohli", "Devdutt Padikkal", "Marcus Stoinis", "Shashank Singh", "Rohit Sharma", "Abhishek Sharma", "Ryan Rickelton", "Jitesh Sharma", "Sherfane Rutherford", "Venkatesh Iyer", "Cameron Green", "Corbin Bosch", "Dhruv Jurel", "Lungi Ngidi", "Prasidh Krishna", "Ruturaj Gaikwad", "Ashutosh Sharma"],
+    "Dashboard XI": ["Kuldeep Yadav", "Mitchell Marsh", "Shivam Dube", "Ravi Bishnoi", "Phil Salt", "Sai Sudharsan", "Tristan Stubbs", "Sunil Narine", "Aiden Markram", "Arshdeep Singh", "Khaleel Ahmed", "Noor Ahmad", "Ayush Mhatre", "Mohammed Siraj", "Varun Chakravarthy", "Nitish Kumar Reddy", "Tim David", "Marco Jansen", "Shubman Gill", "Tim Seifert"],
+    "Shalini's Strikers": ["Heinrich Klaasen", "Riyan Parag", "Josh Inglis", "Jacob Bethell", "Vaibhav Sooryavanshi", "Azmatullah Omarzai", "Dewald Brevis", "Jasprit Bumrah", "Romario Shepherd", "Trent Boult", "Will Jacks", "Hardik Pandya", "Mitchell Santner", "Rovman Powell", "Sanju Samson", "Suryakumar Yadav", "Liam Livingstone", "Jos Buttler", "Finn Allen", "Yashasvi Jaiswal"],
+    "Zlatan's Team": ["Rishabh Pant", "Rashid Khan", "KL Rahul", "Mangesh Yadav", "Ajinkya Rahane", "Travis Head", "Ravindra Jadeja", "Axar Patel", "Priyansh Arya", "Tilak Varma", "Ishan Kishan", "Angkrish Raghuvanshi", "Bhuvneshwar Kumar", "Shimron Hetmyer", "Yuzvendra Chahal", "Krunal Pandya", "Shreyas Iyer", "Quinton de Kock", "Nicholas Pooran", "Prabhsimran Singh"]
+  }
+};
+
+const TEAM_CLASS = {
+  "Ctrl Alt Defeat": "team-cad",
+  "Dashboard XI": "team-dxi",
+  "Shalini's Strikers": "team-shs",
+  "Zlatan's Team": "team-zlt"
+};
+const TEAM_SHORT = {
+  "Ctrl Alt Defeat": "CAD",
+  "Dashboard XI": "DXI",
+  "Shalini's Strikers": "SHS",
+  "Zlatan's Team": "ZLT"
+};
+
+// ==========================================
+// AUTO-CALCULATION ENGINE
+// ==========================================
+function autoCalculateStats() {
+  const matchIds = Object.keys(DATA.matches).sort((a,b) => parseInt(a) - parseInt(b));
+  const totalMatchesContested = matchIds.length;
+  let abandonedCount = 0;
+  let latestDate = "Unknown";
+
+  // 1. Initialize Player Base
+  const computedPlayers = {};
+  Object.entries(DATA.team_players).forEach(([teamName, roster]) => {
+    roster.forEach(playerName => {
+      computedPlayers[playerName] = {
+        team: teamName,
+        total: 0,
+        played: 0,
+        is_c: DATA.teams[teamName].c === playerName,
+        is_vc: DATA.teams[teamName].vc === playerName
+      };
+    });
+  });
+
+  // 2. Tally points per match
+  matchIds.forEach(mid => {
+    const m = DATA.matches[mid];
+    latestDate = m.date;
+    
+    // Create team_pts automatically if missing
+    m.team_pts = {};
+    Object.keys(DATA.teams).forEach(t => m.team_pts[t] = 0);
+
+    if (m.abandoned) {
+      abandonedCount++;
+    } else {
+      if (m.performances) {
+        Object.entries(m.performances).forEach(([pName, perf]) => {
+          // If a player played but wasn't in original base roster string
+          if (!computedPlayers[pName]) {
+             computedPlayers[pName] = { team: perf.team, total: 0, played: 0, is_c: false, is_vc: false };
+          }
+          // Add to player totals
+          computedPlayers[pName].total += perf.pts;
+          computedPlayers[pName].played += 1;
+          // Add to match team total
+          if(m.team_pts[perf.team] !== undefined) {
+             m.team_pts[perf.team] += perf.pts;
+          }
+        });
+      }
+    }
+  });
+
+  DATA.players = computedPlayers;
+
+  // 3. Calculate Global Team Totals
+  Object.keys(DATA.teams).forEach(t => { DATA.teams[t].total = 0; });
+  Object.values(DATA.players).forEach(p => {
+    if (DATA.teams[p.team]) DATA.teams[p.team].total += p.total;
+  });
+
+  // 4. Generate Sorted Standings
+  DATA.sorted_teams = Object.entries(DATA.teams)
+    .map(([name, data]) => [name, data.total])
+    .sort((a, b) => b[1] - a[1]);
+
+  // --- Dynamic DOM Updates ---
+  const topTeam = DATA.sorted_teams[0];
+  const secondTeam = DATA.sorted_teams[1];
+  const gap = topTeam[1] - secondTeam[1];
+
+  let mvpName = "";
+  let mvpPts = -1;
+  let mvpTeam = "";
+  Object.entries(DATA.players).forEach(([name, p]) => {
+    if (p.total > mvpPts) {
+      mvpPts = p.total;
+      mvpName = name;
+      mvpTeam = p.team;
+    }
+  });
+
+  const activeMatches = totalMatchesContested - abandonedCount;
+  
+  // Hero Section Updates
+  document.querySelector('.op-sub').innerHTML = `IPL 2026 · Four Teams · ${totalMatchesContested} Matches In`;
+  document.querySelector('.hero-kicker').innerHTML = `Season Standings · ${latestDate}, 2026`;
+  document.querySelector('.hero-title').innerHTML = `<span class="gold">${topTeam[0].toUpperCase()}</span><br>LEADS THE PACK.`;
+  document.querySelector('.hero-sub').innerHTML = `After ${totalMatchesContested} matches, a <em>${gap}-point gap</em> separates first from second. <em>${mvpName}</em> tops the individual charts with <em>${mvpPts.toLocaleString()} points</em> — a captain's multiplier doing work.`;
+  
+  // MVP Card
+  const hsVals = document.querySelectorAll('.hs-val');
+  const hsNames = document.querySelectorAll('.hs-name');
+  const hsCtxs = document.querySelectorAll('.hs-context');
+  if (hsVals.length > 0) {
+    hsVals[0].innerText = mvpPts.toLocaleString();
+    hsNames[0].innerText = mvpName;
+    hsCtxs[0].innerText = mvpTeam;
+  }
+  
+  // MVP Award Block
+  document.getElementById('awMvpName').innerText = mvpName;
+  document.getElementById('awMvpTeam').innerText = mvpTeam;
+  document.getElementById('awMvpVal').innerText = mvpPts.toLocaleString();
+
+  // Pullbar Stats Updates
+  const totalLeaguePoints = DATA.sorted_teams.reduce((sum, t) => sum + t[1], 0);
+  const playersWithApps = Object.values(DATA.players).filter(p => p.played > 0).length;
+  const pbNums = document.querySelectorAll('.pb-num');
+  const pbLbls = document.querySelectorAll('.pb-lbl');
+  if (pbNums.length >= 4) {
+    pbNums[0].innerText = totalLeaguePoints.toLocaleString();
+    pbNums[1].innerText = totalMatchesContested;
+    pbLbls[1].innerText = `Matches contested${abandonedCount > 0 ? ` · ${abandonedCount} abandoned` : ''}`;
+    pbNums[3].innerText = playersWithApps;
+  }
+
+  // Headers and Footers
+  document.querySelector('.hdr-live').innerHTML = `Live · ${latestDate}`;
+  const footers = document.querySelectorAll('.footer div');
+  if (footers.length >= 3) {
+    footers[1].innerHTML = `M1–M${totalMatchesContested} verified · Scorecards via ESPNcricinfo`;
+    footers[2].innerHTML = `Updated ${latestDate}, 2026`;
+  }
+}
+
+// ==========================================
+// UI LOGIC
+// ==========================================
+const opener = document.getElementById('opener');
+const audio = document.getElementById('themeAudio');
+const audioToggle = document.getElementById('audioToggle');
+const volOn = document.getElementById('volOn');
+const volOff = document.getElementById('volOff');
+let audioPlaying = false;
+document.getElementById('enterBtn').addEventListener('click', function() {
+  opener.classList.add('gone');
+  setTimeout(() => opener.style.display = 'none', 700);
+  audio.volume = 0.25;
+  audio.play().then(() => { audioPlaying = true; }).catch(() => {
+    volOn.style.display = 'none';
+    volOff.style.display = 'block';
+  });
+});
+audioToggle.addEventListener('click', () => {
+  if (audioPlaying) {
+    audio.pause();
+    audioPlaying = false;
+    volOn.style.display = 'none';
+    volOff.style.display = 'block';
+  } else {
+    audio.play().then(() => {
+      audioPlaying = true;
+      volOn.style.display = 'block';
+      volOff.style.display = 'none';
+    }).catch(() => {});
+  }
+});
+
+function renderStandings() {
+  const root = document.getElementById('standings');
+  const max = DATA.sorted_teams[0][1];
+  const medals = ['CHAMPION', 'RUNNER-UP', 'THIRD', 'FOURTH'];
+  root.innerHTML = DATA.sorted_teams.map((st, i) => {
+    const [tname, pts] = st;
+    const pct = pts / max * 100;
+    const gap = i === 0 ? 'LEADER' : '−' + (DATA.sorted_teams[i-1][1] - pts);
+    const teamData = DATA.teams[tname];
+    return `
+    <div class="stand ${TEAM_CLASS[tname]}" data-team="${tname}">
+      <div class="stand-top">
+        <div class="stand-rank">${String(i+1).padStart(2,'0')}</div>
+        <div class="stand-medal">${medals[i]}</div>
+      </div>
+      <div class="stand-team">${tname}</div>
+      <div class="stand-cap">C · <b>${teamData.c}</b> &nbsp;·&nbsp; VC · <b>${teamData.vc}</b></div>
+      <div class="stand-pts">${pts.toLocaleString()}</div>
+      <div class="stand-lbl">FANTASY POINTS</div>
+      <div class="stand-bar"><div class="stand-bar-fill" style="width:${pct}%"></div></div>
+      <div class="stand-gap ${i === 0 ? 'lead' : ''}">${gap}</div>
+    </div>`;
+  }).join('');
+  root.querySelectorAll('.stand').forEach(el => {
+    el.addEventListener('click', () => {
+      const t = el.dataset.team;
+      document.querySelectorAll('#teamTabs .tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.team === t);
+      });
+      filterPlayers();
+      document.querySelector('.player-table').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+}
+
+let matchFilter = 'all';
+function renderMatches() {
+  const root = document.getElementById('matchGrid');
+  const ids = Object.keys(DATA.matches).sort((a,b) => parseInt(a) - parseInt(b));
+  root.innerHTML = ids.map(mid => {
+    const m = DATA.matches[mid];
+    if (m.abandoned) {
+      return `
+      <div class="m-card abnd" data-mid="${mid}">
+        <div class="m-head"><span class="mn">M${String(mid).padStart(2,'0')}</span><span>${m.date}</span></div>
+        <div class="m-teams">${m.label}</div>
+        <div class="m-result">${m.result}</div>
+        <div style="margin-top:auto;text-align:center;padding:1rem;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.2em;color:var(--dim);text-transform:uppercase">— NO PLAY —</div>
+      </div>`;
+    }
+    const teamPts = m.team_pts;
+    const winner = Object.entries(teamPts).reduce((a,b) => b[1] > a[1] ? b : a);
+    const maxPts = winner[1] || 1;
+    const sorted = Object.entries(teamPts).sort((a,b) => b[1] - a[1]);
+    const bars = sorted.map(([t, p]) => `
+      <div class="mbr ${t === winner[0] ? 'mbr-win' : ''}">
+        <span class="mbr-t" style="color:${DATA.teams[t].color}">${TEAM_SHORT[t]}</span>
+        <div class="mbr-tr"><div class="mbr-f" style="width:${p/maxPts*100}%;background:${DATA.teams[t].color}"></div></div>
+        <span class="mbr-p">${p}</span>
+      </div>`).join('');
+    return `
+    <div class="m-card" data-mid="${mid}" data-winner="${winner[0]}">
+      <div class="m-head"><span class="mn">M${String(mid).padStart(2,'0')}</span><span>${m.date}</span></div>
+      <div class="m-teams">${m.label}</div>
+      <div class="m-result">${m.result}</div>
+      <div class="m-bars">${bars}</div>
+      <div class="m-hint">Tap for details</div>
+    </div>`;
+  }).join('');
+  root.querySelectorAll('.m-card:not(.abnd)').forEach(el => {
+    el.addEventListener('click', () => openModal(el.dataset.mid));
+  });
+  applyMatchFilter();
+}
+
+function applyMatchFilter() {
+  document.querySelectorAll('#matchGrid .m-card').forEach(el => {
+    const w = el.dataset.winner;
+    const show = matchFilter === 'all' || w === matchFilter;
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    matchFilter = btn.dataset.filter;
+    applyMatchFilter();
+  });
+});
+
+function openModal(mid) {
+  const m = DATA.matches[mid];
+  const body = document.getElementById('modalBody');
+  const teamsOrdered = Object.entries(m.team_pts).sort((a,b) => b[1] - a[1]);
+  const perfs = Object.entries(m.performances)
+    .sort((a,b) => b[1].pts - a[1].pts)
+    .filter(([,p]) => p.pts !== 0 || p.bat || p.bowl || p.field);
+  const teamBlocks = teamsOrdered.map(([t, p]) => `
+    <div class="mt-block ${TEAM_CLASS[t]}">
+      <div class="mt-name">${t}</div>
+      <div class="mt-pts">${p}</div>
+      <div class="mt-lbl">POINTS</div>
+    </div>`).join('');
+  const perfRows = perfs.map(([name, p]) => {
+    const pdata = DATA.players[name];
+    const capMark = pdata.is_c ? '<span class="cap-badge">C</span>' : pdata.is_vc ? '<span class="cap-badge vc">VC</span>' : '';
+    const parts = [];
+    if (p.bat) parts.push(`<b>BAT</b> ${p.bat}`);
+    if (p.bowl) parts.push(`<b>BOWL</b> ${p.bowl}`);
+    if (p.field) parts.push(`<b>FIELD</b> ${p.field}`);
+    return `
+    <div class="mp-row">
+      <div class="mp-name-col">
+        <div class="mp-name ${TEAM_CLASS[p.team]}">
+          ${name} ${capMark}
+          <span class="mp-team" style="background:${DATA.teams[p.team].color}">${TEAM_SHORT[p.team]}</span>
+        </div>
+        ${parts.length ? `<div class="mp-perf">${parts.join(' · ')}</div>` : ''}
+      </div>
+      <div class="mp-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
+    </div>`;
+  }).join('');
+  body.innerHTML = `
+    <div class="modal-head">
+      <div class="modal-num">MATCH ${String(mid).padStart(2,'0')} · ${m.date}</div>
+      <h2 class="modal-title">${m.label}</h2>
+      <div class="modal-result">${m.result}</div>
+    </div>
+    <div class="modal-teams">${teamBlocks}</div>
+    <div class="modal-perfs">
+      <div class="mp-head">Player Performances (${perfs.length})</div>
+      <div class="mp-list">${perfRows}</div>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('open');
+});
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('open');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.getElementById('modal').classList.remove('open');
+});
+
+let playerFilter = 'all';
+let playerSort = 'pts';
+let playerSortAsc = false;
+let playerSearch = '';
+
+function getAllPlayers() {
+  return Object.entries(DATA.players).map(([name, p]) => ({
+    name, ...p, matches: p.played, pts: p.total
+  }));
+}
+
+function renderPlayers() {
+  let list = getAllPlayers();
+  if (playerFilter !== 'all') list = list.filter(p => p.team === playerFilter);
+  if (playerSearch) {
+    const q = playerSearch.toLowerCase();
+    list = list.filter(p => p.name.toLowerCase().includes(q));
+  }
+  list.sort((a,b) => {
+    let av = a[playerSort], bv = b[playerSort];
+    if (typeof av === 'string') return playerSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+    return playerSortAsc ? av - bv : bv - av;
+  });
+  const root = document.getElementById('playerList');
+  const maxPts = Math.max(...list.map(p => p.pts), 1);
+  root.innerHTML = list.map((p, i) => {
+    const capMark = p.is_c ? '<span class="cap-badge">C</span>' : p.is_vc ? '<span class="cap-badge vc">VC</span>' : '';
+    const cls = p.pts === 0 ? 'zero' : '';
+    return `
+    <div class="pt-row ${cls} ${TEAM_CLASS[p.team]}">
+      <span class="pt-rank">${String(i+1).padStart(2,'0')}</span>
+      <span class="pt-name">${p.name} ${capMark}</span>
+      <span class="pt-team">${p.team}</span>
+      <span class="pt-bar"><span class="pt-bar-f" style="width:${p.pts/maxPts*100}%"></span></span>
+      <span class="pt-m">${p.matches}M</span>
+      <span class="pt-pts">${p.pts}</span>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.pt-head .ch').forEach(h => {
+    h.classList.remove('sorted', 'asc');
+    if (h.dataset.sort === playerSort) {
+      h.classList.add('sorted');
+      if (playerSortAsc) h.classList.add('asc');
+    }
+  });
+}
+
+function filterPlayers() {
+  const active = document.querySelector('#teamTabs .tab.active');
+  playerFilter = active ? active.dataset.team : 'all';
+  renderPlayers();
+}
+
+document.querySelectorAll('#teamTabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('#teamTabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    filterPlayers();
+  });
+});
+
+document.getElementById('playerSearch').addEventListener('input', (e) => {
+  playerSearch = e.target.value;
+  renderPlayers();
+});
+
+document.querySelectorAll('.pt-head .ch[data-sort]').forEach(h => {
+  h.addEventListener('click', () => {
+    const s = h.dataset.sort;
+    if (playerSort === s) playerSortAsc = !playerSortAsc;
+    else { playerSort = s; playerSortAsc = (s === 'name' || s === 'team'); }
+    renderPlayers();
+  });
+});
+
+// Run Init Engine then Render functions
+autoCalculateStats();
+renderStandings();
+renderMatches();
+renderPlayers();
+
+</script>
+</body>
+</html>
