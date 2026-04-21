@@ -257,7 +257,7 @@ body::after { content: ''; position: fixed; inset: 0; background-image: linear-g
 <header class="header">
   <div class="hdr-logo">OG <span class="gold">LEAGUE</span> · IPL 2026</div>
   <div class="hdr-right">
-    <div class="hdr-live">Live</div>
+    <div class="hdr-live" id="liveDate">Live</div>
     <button class="audio-toggle" id="audioToggle" title="Toggle music">
       <svg id="volOn" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
       <svg id="volOff" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.17v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
@@ -266,9 +266,9 @@ body::after { content: ''; position: fixed; inset: 0; background-image: linear-g
 </header>
 <div class="wrap">
 <section class="hero">
-  <div class="hero-kicker">Loading...</div>
-  <h1 class="hero-title">Loading...</h1>
-  <p class="hero-sub">Calculating latest stats...</p>
+  <div class="hero-kicker" id="heroKicker">Loading...</div>
+  <h1 class="hero-title" id="heroTitle">Loading...</h1>
+  <p class="hero-sub" id="heroSub">Calculating latest stats...</p>
   <div class="hero-stats">
     <div class="hero-stat">
       <div class="hs-lbl">Season MVP</div>
@@ -304,10 +304,10 @@ body::after { content: ''; position: fixed; inset: 0; background-image: linear-g
   <div class="standings" id="standings"></div>
 </section>
 <div class="pullbar">
-  <div><div class="pb-num">0</div><div class="pb-lbl">Total points · All teams</div></div>
-  <div><div class="pb-num">0</div><div class="pb-lbl">Matches contested</div></div>
-  <div><div class="pb-num">19</div><div class="pb-lbl">Max active players in any squad</div></div>
-  <div><div class="pb-num">0</div><div class="pb-lbl">Total players with appearances</div></div>
+  <div><div class="pb-num" id="pbTotalPts">-</div><div class="pb-lbl">Total points · All teams</div></div>
+  <div><div class="pb-num" id="pbMatches">-</div><div class="pb-lbl" id="pbMatchesLbl">Matches contested</div></div>
+  <div><div class="pb-num">20</div><div class="pb-lbl">Max active players in any squad</div></div>
+  <div><div class="pb-num" id="pbPlayers">-</div><div class="pb-lbl">Total players with appearances</div></div>
 </div>
 <section class="sec">
   <div class="sec-head">
@@ -400,16 +400,16 @@ body::after { content: ''; position: fixed; inset: 0; background-image: linear-g
   </div>
 </div>
 <footer class="footer">
-  <div><b>OG LEAGUE</b> · IPL 2026 · AuctionRoom v1.6</div>
-  <div>Loading...</div>
-  <div>Updated Loading...</div>
+  <div><b>OG LEAGUE</b> · IPL 2026 · AuctionRoom v1.7</div>
+  <div id="footerMatches">Loading...</div>
+  <div id="footerDate">Loading...</div>
 </footer>
 </div>
 <script>
 const DATA = {
   "teams": {
     "Ctrl Alt Defeat": { "color": "#FF6B35", "c": "Virat Kohli", "vc": "Abhishek Sharma" },
-    "Dashboard XI": { "color": "#FFD700", "c": "Phil Salt", "vc": "Shivam Dube" },
+    "Dashboard XI": { "color": "#FFC72C", "c": "Phil Salt", "vc": "Shivam Dube" },
     "Shalini's Strikers": { "color": "#10B981", "c": "Vaibhav Sooryavanshi", "vc": "Hardik Pandya" },
     "Zlatan's Team": { "color": "#A855F7", "c": "Shreyas Iyer", "vc": "Ishan Kishan" }
   },
@@ -466,8 +466,12 @@ const TEAM_SHORT = {
   "Zlatan's Team": "ZLT"
 };
 
+// SAFE DOM UPDATER
+const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
 // ==========================================
-// DYNAMIC AUTO-CALCULATION ENGINE (AUCTIONROOM RULES)
+// DYNAMIC AUTO-CALCULATION ENGINE v1.7 (AUCTIONROOM RULES)
 // ==========================================
 function autoCalculateStats() {
   const matchIds = Object.keys(DATA.matches).sort((a,b) => parseInt(a) - parseInt(b));
@@ -489,7 +493,7 @@ function autoCalculateStats() {
   let hsTopBatRuns = -1, hsTopBatName = "-", hsTopBatCtx = "-", hsTopBatStr = "-";
   let hsTopBowlW = -1, hsTopBowlR = 999, hsTopBowlName = "-", hsTopBowlCtx = "-", hsTopBowlStr = "-";
   let hsMaxTeamPts = -1, hsMaxTeamName = "-", hsMaxTeamCtx = "-";
-
+  
   matchIds.forEach(mid => {
     const m = DATA.matches[mid];
     latestDate = m.date;
@@ -506,9 +510,9 @@ function autoCalculateStats() {
           }
           
           let bPts = 0, bwPts = 0, fPts = 0;
-          let startPts = 4; // Playing XI Base
+          let startPts = 4; 
           
-          // BATTING POINTS (From AuctionRoom Screenshots)
+          // BATTING POINTS (AuctionRoom)
           if (perf.bat) {
             let batStr = perf.bat.trim();
             let isNotOut = batStr.includes('*');
@@ -524,28 +528,24 @@ function autoCalculateStats() {
               let fours = fMatch ? parseInt(fMatch[1]) : 0;
               let sixes = sMatch ? parseInt(sMatch[1]) : 0;
               
-              bPts += runs;           // Each Run Scored = +1
-              bPts += fours * 4;      // Four Bonus = +4
-              bPts += sixes * 6;      // Six Bonus = +6
+              bPts += runs + (fours * 4) + (sixes * 6);
               
-              if (runs === 0 && !isNotOut) bPts -= 2; // Duck Penalty
+              if (runs === 0 && !isNotOut) bPts -= 2;
               
-              // Milestones (Highest Only)
               if (runs >= 100) bPts += 16;
               else if (runs >= 75) bPts += 12;
               else if (runs >= 50) bPts += 8;
               else if (runs >= 25) bPts += 4;
               
-              // Strike Rate Bonus (Min 10 balls OR 20 runs)
               if (runs >= 20 || balls >= 10) {
                 let sr = (runs / balls) * 100;
                 if (sr > 190) bPts += 8;
                 else if (sr > 170) bPts += 6;
                 else if (sr > 150) bPts += 4;
-                else if (sr >= 130) bPts += 2;
+                else if (sr >= 130 && sr <= 150) bPts += 2;
                 else if (sr >= 70 && sr <= 100) bPts -= 2;
                 else if (sr >= 60 && sr < 70) bPts -= 4;
-                else if (sr <= 59.99) bPts -= 6;
+                else if (sr < 60) bPts -= 6;
               }
 
               if (runs > hsTopBatRuns) {
@@ -557,7 +557,7 @@ function autoCalculateStats() {
             }
           }
           
-          // BOWLING POINTS (From AuctionRoom Screenshots)
+          // BOWLING POINTS (AuctionRoom)
           if (perf.bowl) {
             let match = perf.bowl.match(/^(\d+)\/(\d+)\s*\(([\d.]+)\)$/);
             if (match) {
@@ -569,20 +569,18 @@ function autoCalculateStats() {
               let totalBalls = (parseInt(overParts[0]) * 6) + (overParts.length > 1 ? parseInt(overParts[1]) : 0);
               let exactOvers = totalBalls / 6;
 
-              bwPts += w * 30; // +30 per wicket
+              bwPts += w * 30;
 
-              // Milestones (Highest Only)
               if (w >= 5) bwPts += 16;
               else if (w === 4) bwPts += 12;
               else if (w === 3) bwPts += 8;
 
-              // Economy Rate (Min 2 overs = 12 balls)
               if (totalBalls >= 12) {
                  let eco = r / exactOvers;
                  if (eco < 5.00) bwPts += 8;
-                 else if (eco < 6.00) bwPts += 6;
-                 else if (eco <= 7.00) bwPts += 4;
-                 else if (eco <= 8.00) bwPts += 2;
+                 else if (eco >= 5.00 && eco < 6.00) bwPts += 6;
+                 else if (eco >= 6.00 && eco <= 7.00) bwPts += 4;
+                 else if (eco > 7.00 && eco <= 8.00) bwPts += 2;
                  else if (eco >= 10.00 && eco <= 11.00) bwPts -= 2;
                  else if (eco > 11.00 && eco <= 12.00) bwPts -= 4;
                  else if (eco > 12.00) bwPts -= 6;
@@ -598,7 +596,7 @@ function autoCalculateStats() {
             }
           }
           
-          // FIELDING POINTS (From AuctionRoom Screenshots)
+          // FIELDING POINTS (AuctionRoom)
           if (perf.field) {
             let fStr = perf.field.toLowerCase();
             let c = 0, st = 0, ro = 0;
@@ -610,10 +608,10 @@ function autoCalculateStats() {
               if (p.includes('ro')) ro += n;
             });
             
-            fPts += c * 8; // Catch = +8
-            if (c >= 3) fPts += 4; // 3+ Catches = +4
-            fPts += st * 12; // Stumping = +12
-            fPts += ro * 10; // Direct Hit (Defaulting to +10)
+            fPts += c * 8; 
+            if (c >= 3) fPts += 4; 
+            fPts += st * 12;
+            fPts += ro * 10;
           }
           
           computedPlayers[pName].bat_pts += bPts;
@@ -673,55 +671,55 @@ function autoCalculateStats() {
   const secondTeam = DATA.sorted_teams[1];
   const gap = topTeam[1] - secondTeam[1];
   
-  document.querySelector('.op-sub').innerHTML = `IPL 2026 · Four Teams · ${totalMatchesContested} Matches In`;
-  document.querySelector('.hero-kicker').innerHTML = `Season Standings · ${latestDate}, 2026`;
-  document.querySelector('.hero-title').innerHTML = `<span class="gold">${topTeam[0].toUpperCase()}</span><br>LEADS THE PACK.`;
-  document.querySelector('.hero-sub').innerHTML = `After ${totalMatchesContested} matches, a <em>${gap.toLocaleString()}-point gap</em> separates first from second. <em>${topMvp.name}</em> tops the individual charts with <em>${topMvp.val.toLocaleString()} points</em> — a captain's multiplier doing work.`;
+  setHtml('heroKicker', `Season Standings · ${latestDate}, 2026`);
+  setHtml('heroTitle', `<span class="gold">${topTeam[0].toUpperCase()}</span><br>LEADS THE PACK.`);
+  setHtml('heroSub', `After ${totalMatchesContested} matches, a <em>${gap.toLocaleString()}-point gap</em> separates first from second. <em>${topMvp.name}</em> tops the individual charts with <em>${topMvp.val.toLocaleString()} points</em> — a captain's multiplier doing work.`);
   
-  document.getElementById('hsMvpVal').innerText = topMvp.val.toLocaleString();
-  document.getElementById('hsMvpName').innerText = topMvp.name;
-  document.getElementById('hsMvpCtx').innerText = topMvp.team;
+  setTxt('hsMvpVal', topMvp.val.toLocaleString());
+  setTxt('hsMvpName', topMvp.name);
+  setTxt('hsMvpCtx', topMvp.team);
   
-  document.getElementById('hsTopScoreVal').innerHTML = hsTopBatStr;
-  document.getElementById('hsTopScoreName').innerText = hsTopBatName;
-  document.getElementById('hsTopScoreCtx').innerText = hsTopBatCtx;
+  setHtml('hsTopScoreVal', hsTopBatStr);
+  setTxt('hsTopScoreName', hsTopBatName);
+  setTxt('hsTopScoreCtx', hsTopBatCtx);
   
-  document.getElementById('hsBestBowlVal').innerHTML = hsTopBowlStr;
-  document.getElementById('hsBestBowlName').innerText = hsTopBowlName;
-  document.getElementById('hsBestBowlCtx').innerText = hsTopBowlCtx;
+  setHtml('hsBestBowlVal', hsTopBowlStr);
+  setTxt('hsBestBowlName', hsTopBowlName);
+  setTxt('hsBestBowlCtx', hsTopBowlCtx);
   
-  document.getElementById('hsBiggestHaulVal').innerText = hsMaxTeamPts.toLocaleString();
-  document.getElementById('hsBiggestHaulName').innerText = hsMaxTeamName;
-  document.getElementById('hsBiggestHaulCtx').innerText = hsMaxTeamCtx;
+  setTxt('hsBiggestHaulVal', hsMaxTeamPts.toLocaleString());
+  setTxt('hsBiggestHaulName', hsMaxTeamName);
+  setTxt('hsBiggestHaulCtx', hsMaxTeamCtx);
 
-  document.getElementById('awBatName').innerText = topBat.name;
-  document.getElementById('awBatTeam').innerText = topBat.team;
-  document.getElementById('awBatVal').innerText = topBat.val.toLocaleString();
+  setTxt('awBatName', topBat.name);
+  setTxt('awBatTeam', topBat.team);
+  setTxt('awBatVal', topBat.val.toLocaleString());
   
-  document.getElementById('awBowlName').innerText = topBowl.name;
-  document.getElementById('awBowlTeam').innerText = topBowl.team;
-  document.getElementById('awBowlVal').innerText = topBowl.val.toLocaleString();
+  setTxt('awBowlName', topBowl.name);
+  setTxt('awBowlTeam', topBowl.team);
+  setTxt('awBowlVal', topBowl.val.toLocaleString());
   
-  document.getElementById('awFieldName').innerText = topField.name;
-  document.getElementById('awFieldTeam').innerText = topField.team;
-  document.getElementById('awFieldVal').innerText = topField.val.toLocaleString();
+  setTxt('awFieldName', topField.name);
+  setTxt('awFieldTeam', topField.team);
+  setTxt('awFieldVal', topField.val.toLocaleString());
   
-  document.getElementById('awMvpCardName').innerText = topMvp.name;
-  document.getElementById('awMvpCardTeam').innerText = topMvp.team;
-  document.getElementById('awMvpCardVal').innerText = topMvp.val.toLocaleString();
+  setTxt('awMvpCardName', topMvp.name);
+  setTxt('awMvpCardTeam', topMvp.team);
+  setTxt('awMvpCardVal', topMvp.val.toLocaleString());
 
   const totalLeaguePoints = DATA.sorted_teams.reduce((sum, t) => sum + t[1], 0);
   const playersWithApps = Object.values(DATA.players).filter(p => p.played > 0).length;
-  const pbNums = document.querySelectorAll('.pb-num');
-  const pbLbls = document.querySelectorAll('.pb-lbl');
-  if (pbNums.length >= 4) {
-    pbNums[0].innerText = totalLeaguePoints.toLocaleString();
-    pbNums[1].innerText = totalMatchesContested;
-    pbLbls[1].innerText = `Matches contested${abandonedCount > 0 ? ` · ${abandonedCount} abandoned` : ''}`;
-    pbNums[3].innerText = playersWithApps;
-  }
+  
+  setTxt('pbTotalPts', totalLeaguePoints.toLocaleString());
+  setTxt('pbMatches', totalMatchesContested);
+  setTxt('pbMatchesLbl', `Matches contested${abandonedCount > 0 ? ` · ${abandonedCount} abandoned` : ''}`);
+  setTxt('pbPlayers', playersWithApps);
 
-  document.querySelector('.hdr-live').innerHTML = `Live · ${latestDate}`;
+  setTxt('footerMatches', `M1–M${totalMatchesContested} verified · Scorecards via ESPNcricinfo`);
+  setTxt('footerDate', `Updated ${latestDate}, 2026`);
+
+  const liveElem = document.querySelector('.hdr-live');
+  if (liveElem) liveElem.innerHTML = `Live · ${latestDate}`;
 }
 
 // ==========================================
@@ -733,6 +731,7 @@ const audioToggle = document.getElementById('audioToggle');
 const volOn = document.getElementById('volOn');
 const volOff = document.getElementById('volOff');
 let audioPlaying = false;
+
 document.getElementById('enterBtn').addEventListener('click', function() {
   opener.classList.add('gone');
   setTimeout(() => opener.style.display = 'none', 700);
@@ -742,6 +741,7 @@ document.getElementById('enterBtn').addEventListener('click', function() {
     volOff.style.display = 'block';
   });
 });
+
 audioToggle.addEventListener('click', () => {
   if (audioPlaying) {
     audio.pause();
@@ -780,6 +780,7 @@ function renderStandings() {
       <div class="stand-gap ${i === 0 ? 'lead' : ''}">${gap}</div>
     </div>`;
   }).join('');
+  
   root.querySelectorAll('.stand').forEach(el => {
     el.addEventListener('click', () => {
       const t = el.dataset.team;
@@ -795,7 +796,10 @@ function renderStandings() {
 let matchFilter = 'all';
 function renderMatches() {
   const root = document.getElementById('matchGrid');
-  const ids = Object.keys(DATA.matches).sort((a,b) => parseInt(a) - parseInt(b));
+  const ids = Object.keys(DATA.matches).sort((a,b) => parseInt(b) - parseInt(a));
+  
+  const winCounts = { "all": 0, "Ctrl Alt Defeat": 0, "Dashboard XI": 0, "Shalini's Strikers": 0, "Zlatan's Team": 0 };
+
   root.innerHTML = ids.map(mid => {
     const m = DATA.matches[mid];
     if (m.abandoned) {
@@ -810,6 +814,10 @@ function renderMatches() {
     const teamPts = m.team_pts;
     const winner = Object.entries(teamPts).reduce((a,b) => b[1] > a[1] ? b : a);
     const maxPts = winner[1] || 1;
+    
+    winCounts["all"]++;
+    if(winCounts[winner[0]] !== undefined) winCounts[winner[0]]++;
+
     const sorted = Object.entries(teamPts).sort((a,b) => b[1] - a[1]);
     const bars = sorted.map(([t, p]) => `
       <div class="mbr ${t === winner[0] ? 'mbr-win' : ''}">
@@ -817,6 +825,7 @@ function renderMatches() {
         <div class="mbr-tr"><div class="mbr-f" style="width:${p/maxPts*100}%;background:${DATA.teams[t].color}"></div></div>
         <span class="mbr-p">${p.toLocaleString()}</span>
       </div>`).join('');
+      
     return `
     <div class="m-card" data-mid="${mid}" data-winner="${winner[0]}">
       <div class="m-head"><span class="mn">M${String(mid).padStart(2,'0')}</span><span>${m.date}</span></div>
@@ -826,9 +835,20 @@ function renderMatches() {
       <div class="m-hint">Tap for details</div>
     </div>`;
   }).join('');
+  
   root.querySelectorAll('.m-card:not(.abnd)').forEach(el => {
     el.addEventListener('click', () => openModal(el.dataset.mid));
   });
+
+  document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(btn => {
+    let t = btn.dataset.filter;
+    if(t === 'all') btn.innerHTML = `All · ${winCounts[t]}`;
+    else if(t === 'Ctrl Alt Defeat') btn.innerHTML = `Ctrl Alt won · ${winCounts[t]}`;
+    else if(t === 'Dashboard XI') btn.innerHTML = `Dashboard won · ${winCounts[t]}`;
+    else if(t === "Shalini's Strikers") btn.innerHTML = `Shalini's won · ${winCounts[t]}`;
+    else if(t === "Zlatan's Team") btn.innerHTML = `Zlatan's won · ${winCounts[t]}`;
+  });
+
   applyMatchFilter();
 }
 
@@ -856,12 +876,14 @@ function openModal(mid) {
   const perfs = Object.entries(m.performances)
     .sort((a,b) => b[1].pts - a[1].pts)
     .filter(([,p]) => p.pts !== 0 || p.bat || p.bowl || p.field);
+    
   const teamBlocks = teamsOrdered.map(([t, p]) => `
     <div class="mt-block ${TEAM_CLASS[t]}">
       <div class="mt-name">${t}</div>
       <div class="mt-pts">${p.toLocaleString()}</div>
       <div class="mt-lbl">POINTS</div>
     </div>`).join('');
+    
   const perfRows = perfs.map(([name, p]) => {
     const pdata = DATA.players[name];
     const capMark = pdata.is_c ? '<span class="cap-badge">C</span>' : pdata.is_vc ? '<span class="cap-badge vc">VC</span>' : '';
@@ -881,6 +903,7 @@ function openModal(mid) {
       <div class="mp-pts">${p.pts > 0 ? '+' : ''}${p.pts}</div>
     </div>`;
   }).join('');
+  
   body.innerHTML = `
     <div class="modal-head">
       <div class="modal-num">MATCH ${String(mid).padStart(2,'0')} · ${m.date}</div>
@@ -929,8 +952,10 @@ function renderPlayers() {
     if (typeof av === 'string') return playerSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
     return playerSortAsc ? av - bv : bv - av;
   });
+  
   const root = document.getElementById('playerList');
   const maxPts = Math.max(...list.map(p => p.pts), 1);
+  
   root.innerHTML = list.map((p, i) => {
     const capMark = p.is_c ? '<span class="cap-badge">C</span>' : p.is_vc ? '<span class="cap-badge vc">VC</span>' : '';
     const cls = p.pts === 0 ? 'zero' : '';
@@ -944,6 +969,7 @@ function renderPlayers() {
       <span class="pt-pts">${p.pts.toLocaleString()}</span>
     </div>`;
   }).join('');
+  
   document.querySelectorAll('.pt-head .ch').forEach(h => {
     h.classList.remove('sorted', 'asc');
     if (h.dataset.sort === playerSort) {
@@ -986,7 +1012,6 @@ autoCalculateStats();
 renderStandings();
 renderMatches();
 renderPlayers();
-
 </script>
 </body>
 </html>
