@@ -367,8 +367,12 @@ const TEAM_SHORT = {
   "Zlatan's Team": "ZLT"
 };
 
+// SAFE DOM UPDATER TO PREVENT CRASHES
+const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+const setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
 // ==========================================
-// DYNAMIC AUTO-CALCULATION ENGINE v1.4
+// DYNAMIC AUTO-CALCULATION ENGINE v1.5
 // ==========================================
 function autoCalculateStats() {
   const matchIds = Object.keys(DATA.matches).sort((a,b) => parseInt(a) - parseInt(b));
@@ -391,7 +395,6 @@ function autoCalculateStats() {
   let hsTopBowlW = -1, hsTopBowlR = 999, hsTopBowlName = "-", hsTopBowlCtx = "-", hsTopBowlStr = "-";
   let hsMaxTeamPts = -1, hsMaxTeamName = "-", hsMaxTeamCtx = "-";
   
-  // Track match points sequence for Sparklines
   let teamMatchHistory = {
     "Ctrl Alt Defeat": [], "Dashboard XI": [], "Shalini's Strikers": [], "Zlatan's Team": []
   };
@@ -414,34 +417,33 @@ function autoCalculateStats() {
           }
           
           let bPts = 0, bwPts = 0, fPts = 0;
-          let startPts = 4; // Playing XI Base
+          let startPts = 4; 
           
-          // BATTING POINTS (From PDF)
+          // BATTING POINTS
           if (perf.bat) {
             let batStr = perf.bat.trim();
             let isNotOut = batStr.includes('*');
             batStr = batStr.replace('*', '');
-            let match = batStr.match(/^(\d+)\((\d+)\)\s+(\d+)x4\s+(\d+)x6$/);
             
-            if (match) {
-              let runs = parseInt(match[1]);
-              let balls = parseInt(match[2]);
-              let fours = parseInt(match[3]);
-              let sixes = parseInt(match[4]);
+            // Safer Regex that won't fail if 4s/6s are missing
+            let rMatch = batStr.match(/^(\d+)\((\d+)\)/);
+            let fMatch = batStr.match(/(\d+)x4/);
+            let sMatch = batStr.match(/(\d+)x6/);
+            
+            if (rMatch) {
+              let runs = parseInt(rMatch[1]);
+              let balls = parseInt(rMatch[2]);
+              let fours = fMatch ? parseInt(fMatch[1]) : 0;
+              let sixes = sMatch ? parseInt(sMatch[1]) : 0;
               
-              // Base Runs & Boundaries
               bPts += runs + (fours * 4) + (sixes * 6);
-              
-              // Duck Penalty
               if (runs === 0 && !isNotOut) bPts -= 2;
               
-              // Milestones (Highest Only)
               if (runs >= 100) bPts += 16;
               else if (runs >= 75) bPts += 12;
               else if (runs >= 50) bPts += 8;
               else if (runs >= 25) bPts += 4;
               
-              // Strike Rate Bonus
               if (runs >= 20 || balls >= 10) {
                 if ((runs / balls * 100) > 190) bPts += 8;
               }
@@ -519,7 +521,6 @@ function autoCalculateStats() {
         
         m.topScorer = matchTopScorer;
 
-        // Push sequence for sparklines
         Object.keys(DATA.teams).forEach(t => {
             teamMatchHistory[t].push(m.team_pts[t]);
         });
@@ -558,33 +559,34 @@ function autoCalculateStats() {
 
   DATA.players = computedPlayers;
 
-  // DOM UPDATES
+  // SAFE DOM UPDATES
   const totalLeaguePoints = DATA.sorted_teams.reduce((sum, t) => sum + t[1], 0);
 
-  document.getElementById('matchCountSub').innerText = `${totalMatchesContested} Matches`;
+  setTxt('matchCountSub', `${totalMatchesContested} Matches`);
   
-  document.getElementById('hsMvpVal').innerText = topMvp.val.toLocaleString();
-  document.getElementById('hsMvpName').innerText = topMvp.name;
-  document.getElementById('hsMvpCtx').innerText = topMvp.team;
+  setTxt('hsMvpVal', topMvp.val.toLocaleString());
+  setTxt('hsMvpName', topMvp.name);
+  setTxt('hsMvpCtx', topMvp.team);
   
-  document.getElementById('hsTopScoreVal').innerHTML = hsTopBatStr;
-  document.getElementById('hsTopScoreName').innerText = hsTopBatName;
+  setHtml('hsTopScoreVal', hsTopBatStr);
+  setTxt('hsTopScoreName', hsTopBatName);
   
-  document.getElementById('hsBestBowlVal').innerHTML = hsTopBowlStr;
-  document.getElementById('hsBestBowlName').innerText = hsTopBowlName;
+  setHtml('hsBestBowlVal', hsTopBowlStr);
+  setTxt('hsBestBowlName', hsTopBowlName);
   
-  document.getElementById('hsBiggestHaulVal').innerText = hsMaxTeamPts.toLocaleString();
-  document.getElementById('hsBiggestHaulName').innerText = hsMaxTeamName;
-  document.getElementById('totalPtsVal').innerText = totalLeaguePoints.toLocaleString();
+  setTxt('hsBiggestHaulVal', hsMaxTeamPts.toLocaleString());
+  setTxt('hsBiggestHaulName', hsMaxTeamName);
+  
+  setTxt('totalPtsVal', totalLeaguePoints.toLocaleString());
 
-  document.getElementById('awBatName').innerText = topBat.name;
-  document.getElementById('awBatVal').innerText = topBat.val.toLocaleString();
-  document.getElementById('awBowlName').innerText = topBowl.name;
-  document.getElementById('awBowlVal').innerText = topBowl.val.toLocaleString();
-  document.getElementById('awFieldName').innerText = topField.name;
-  document.getElementById('awFieldVal').innerText = topField.val.toLocaleString();
+  setTxt('awBatName', topBat.name);
+  setTxt('awBatVal', topBat.val.toLocaleString());
+  setTxt('awBowlName', topBowl.name);
+  setTxt('awBowlVal', topBowl.val.toLocaleString());
+  setTxt('awFieldName', topField.name);
+  setTxt('awFieldVal', topField.val.toLocaleString());
 
-  document.getElementById('liveDate').innerText = `LIVE · ${latestDate}`;
+  setTxt('liveDate', `LIVE · ${latestDate}`);
 }
 
 // ==========================================
@@ -603,8 +605,6 @@ document.getElementById('enterBtn').addEventListener('click', function() {
 
 function renderStandings() {
   const root = document.getElementById('standings');
-  
-  // Calculate max match points ever scored to normalize sparkline height
   let maxHistoryVal = 0;
   Object.values(DATA.teamMatchHistory).forEach(arr => {
       arr.forEach(v => { if(v > maxHistoryVal) maxHistoryVal = v; });
@@ -613,8 +613,6 @@ function renderStandings() {
   root.innerHTML = DATA.sorted_teams.map((st, i) => {
     const [tname, pts] = st;
     const teamData = DATA.teams[tname];
-    
-    // Generate Sparkline for last 5 matches
     const history = DATA.teamMatchHistory[tname];
     const last5 = history.slice(Math.max(history.length - 5, 0));
     const sparkHtml = last5.map(val => {
@@ -652,17 +650,20 @@ function renderStandings() {
 let matchFilter = 'all';
 function renderMatches() {
   const root = document.getElementById('matchGrid');
-  const ids = Object.keys(DATA.matches).sort((a,b) => parseInt(b) - parseInt(a)); // Reverse order (newest first)
-  
+  const ids = Object.keys(DATA.matches).sort((a,b) => parseInt(b) - parseInt(a));
+  const winCounts = { "all": 0, "Ctrl Alt Defeat": 0, "Dashboard XI": 0, "Shalini's Strikers": 0, "Zlatan's Team": 0 };
+
   root.innerHTML = ids.map(mid => {
     const m = DATA.matches[mid];
-    if (m.abandoned) return ''; // Skip abandoned for cleaner view
+    if (m.abandoned) return ''; 
 
     const teamPts = m.team_pts;
     const winner = Object.entries(teamPts).reduce((a,b) => b[1] > a[1] ? b : a);
     const maxPts = winner[1] || 1;
+    winCounts["all"]++;
+    if(winCounts[winner[0]] !== undefined) winCounts[winner[0]]++;
+
     const sorted = Object.entries(teamPts).sort((a,b) => b[1] - a[1]);
-    
     const bars = sorted.map(([t, p]) => `
       <div class="mc-bar-row ${TEAM_CLASS[t]}">
         <span class="mc-bar-name">${TEAM_SHORT[t]}</span>
@@ -689,12 +690,40 @@ function renderMatches() {
   root.querySelectorAll('.match-card').forEach(el => {
     el.addEventListener('click', () => openModal(el.dataset.mid));
   });
+
+  document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(btn => {
+    let t = btn.dataset.filter;
+    if(t === 'all') btn.innerHTML = `All · ${winCounts[t]}`;
+    else if(t === 'Ctrl Alt Defeat') btn.innerHTML = `Ctrl Alt won · ${winCounts[t]}`;
+    else if(t === 'Dashboard XI') btn.innerHTML = `Dashboard won · ${winCounts[t]}`;
+    else if(t === "Shalini's Strikers") btn.innerHTML = `Shalini's won · ${winCounts[t]}`;
+    else if(t === "Zlatan's Team") btn.innerHTML = `Zlatan's won · ${winCounts[t]}`;
+  });
+
+  applyMatchFilter();
 }
+
+function applyMatchFilter() {
+  document.querySelectorAll('#matchGrid .m-card').forEach(el => {
+    const w = el.dataset.winner;
+    const show = matchFilter === 'all' || w === matchFilter;
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#matchCtrls .ctrl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    matchFilter = btn.dataset.filter;
+    applyMatchFilter();
+  });
+});
 
 function openModal(mid) {
   const m = DATA.matches[mid];
-  document.getElementById('mTitle').innerText = m.label;
-  document.getElementById('mSub').innerText = `Match ${mid} · ${m.date} · ${m.result}`;
+  setTxt('mTitle', m.label);
+  setTxt('mSub', `Match ${mid} · ${m.date} · ${m.result}`);
   
   const body = document.getElementById('modalBody');
   const perfs = Object.entries(m.performances)
@@ -746,7 +775,6 @@ function renderPlayers() {
   });
 
   const root = document.getElementById('playerList');
-  const maxPts = Math.max(...list.map(p => p.pts), 1);
   
   root.innerHTML = list.map((p, i) => {
     const capMark = p.is_c ? '<span class="cap-badge">C</span>' : p.is_vc ? '<span class="cap-badge vc">VC</span>' : '';
