@@ -1010,9 +1010,52 @@ const DATA = {
   },
   "team_players": {
     "Ctrl Alt Defeat": ["Rinku Singh", "David Miller", "Mitchell Starc", "Virat Kohli", "Devdutt Padikkal", "Marcus Stoinis", "Shashank Singh", "Rohit Sharma", "Abhishek Sharma", "Ryan Rickelton", "Jitesh Sharma", "Sherfane Rutherford", "Venkatesh Iyer", "Cameron Green", "Corbin Bosch", "Dhruv Jurel", "Lungi Ngidi", "Prasidh Krishna", "Ruturaj Gaikwad", "Ashutosh Sharma"],
-    "Dashboard XI": ["Kuldeep Yadav", "Mitchell Marsh", "Shivam Dube", "Ravi Bishnoi", "Phil Salt", "Sai Sudharsan", "Tristan Stubbs", "Sunil Narine", "Aiden Markram", "Arshdeep Singh", "Khaleel Ahmed", "Noor Ahmad", "Ayush Mhatre", "Mohammed Siraj", "Varun Chakravarthy", "Nitish Kumar Reddy", "Tim David", "Marco Jansen", "Shubman Gill", "Tim Seifert"],
+    "Dashboard XI": ["Kuldeep Yadav", "Mitchell Marsh", "Shivam Dube", "Ravi Bishnoi", "Phil Salt", "Sai Sudharsan", "Tristan Stubbs", "Sunil Narine", "Aiden Markram", "Arshdeep Singh", "Khaleel Ahmed", "Noor Ahmad", "Pathum Nissanka", "Mohammed Siraj", "Varun Chakravarthy", "Nitish Kumar Reddy", "Tim David", "Marco Jansen", "Shubman Gill", "Tim Seifert"],
     "Shalini's Strikers": ["Heinrich Klaasen", "Riyan Parag", "Josh Inglis", "Jacob Bethell", "Vaibhav Sooryavanshi", "Azmatullah Omarzai", "Dewald Brevis", "Jasprit Bumrah", "Romario Shepherd", "Trent Boult", "Will Jacks", "Hardik Pandya", "Mitchell Santner", "Rovman Powell", "Sanju Samson", "Suryakumar Yadav", "Liam Livingstone", "Jos Buttler", "Finn Allen", "Yashasvi Jaiswal"],
     "Zlatan's Team": ["Rishabh Pant", "Rashid Khan", "KL Rahul", "Mangesh Yadav", "Ajinkya Rahane", "Travis Head", "Ravindra Jadeja", "Axar Patel", "Priyansh Arya", "Tilak Varma", "Ishan Kishan", "Angkrish Raghuvanshi", "Bhuvneshwar Kumar", "Shimron Hetmyer", "Yuzvendra Chahal", "Krunal Pandya", "Shreyas Iyer", "Quinton de Kock", "Nicholas Pooran", "Prabhsimran Singh"]
+  }
+};
+
+// ==========================================
+// MANUAL POINT OVERRIDES (authoritative)
+// As of May 12, 2026 — overrides engine totals
+// ==========================================
+const MANUAL_POINTS = {
+  "Zlatan's Team": {
+    "Shreyas Iyer": 1632, "Travis Head": 1144.5, "Bhuvneshwar Kumar": 1060,
+    "KL Rahul": 988, "Ishan Kishan": 911, "Rashid Khan": 845,
+    "Prabhsimran Singh": 805, "Krunal Pandya": 757, "Priyansh Arya": 750,
+    "Ravindra Jadeja": 719, "Axar Patel": 700, "Tilak Varma": 583,
+    "Rishabh Pant": 571, "Angkrish Raghuvanshi": 551, "Ajinkya Rahane": 426,
+    "Nicholas Pooran": 404, "Yuzvendra Chahal": 390, "Quinton de Kock": 282,
+    "Shimron Hetmyer": 193, "Mangesh Yadav": 0
+  },
+  "Ctrl Alt Defeat": {
+    "Virat Kohli": 1622, "Abhishek Sharma": 1600.5, "Ryan Rickelton": 852,
+    "Devdutt Padikkal": 772, "Dhruv Jurel": 759, "Cameron Green": 658,
+    "Ruturaj Gaikwad": 574, "Rinku Singh": 535, "Prasidh Krishna": 515,
+    "Rohit Sharma": 509, "Marcus Stoinis": 484, "Lungi Ngidi": 461,
+    "David Miller": 394, "Corbin Bosch": 316, "Ashutosh Sharma": 307,
+    "Jitesh Sharma": 290, "Shashank Singh": 284, "Mitchell Starc": 252,
+    "Sherfane Rutherford": 247, "Venkatesh Iyer": 79
+  },
+  "Dashboard XI": {
+    "Mitchell Marsh": 1546, "Shubman Gill": 962, "Sai Sudharsan": 888,
+    "Nitish Kumar Reddy": 814, "Varun Chakravarthy": 741, "Sunil Narine": 680,
+    "Mohammed Siraj": 670, "Arshdeep Singh": 637, "Noor Ahmad": 626,
+    "Pathum Nissanka": 592, "Aiden Markram": 535, "Tristan Stubbs": 523,
+    "Tim David": 514, "Ravi Bishnoi": 504, "Marco Jansen": 477,
+    "Phil Salt": 446, "Shivam Dube": 385, "Kuldeep Yadav": 381,
+    "Khaleel Ahmed": 170, "Tim Seifert": 76
+  },
+  "Shalini's Strikers": {
+    "Vaibhav Sooryavanshi": 1972, "Heinrich Klaasen": 996, "Sanju Samson": 919,
+    "Jos Buttler": 865, "Hardik Pandya": 720, "Yashasvi Jaiswal": 673,
+    "Riyan Parag": 519, "Finn Allen": 464, "Romario Shepherd": 449,
+    "Suryakumar Yadav": 409, "Jasprit Bumrah": 353, "Mitchell Santner": 298,
+    "Rovman Powell": 287, "Dewald Brevis": 274, "Josh Inglis": 222,
+    "Will Jacks": 191, "Jacob Bethell": 162, "Trent Boult": 148,
+    "Liam Livingstone": 59, "Azmatullah Omarzai": 0
   }
 };
 
@@ -1221,6 +1264,32 @@ function autoCalculateStats() {
     if (p.total > topMvp.val) topMvp = {name, team:p.team, val:p.total};
     if (p.played > mostMatches.val) mostMatches = {name, team:p.team, val:p.played};
   });
+
+  // === MANUAL POINT OVERRIDE ===
+  // Replace engine totals with authoritative manual totals (May 12, 2026)
+  if (typeof MANUAL_POINTS !== 'undefined') {
+    Object.keys(DATA.teams).forEach(t => { DATA.teams[t].total = 0; });
+    Object.entries(MANUAL_POINTS).forEach(([teamName, players]) => {
+      Object.entries(players).forEach(([playerName, pts]) => {
+        if (!computedPlayers[playerName]) {
+          computedPlayers[playerName] = {
+            name: playerName, team: teamName, total: 0, raw: 0, played: 0,
+            bat_pts: 0, bowl_pts: 0, field_pts: 0,
+            is_c: DATA.teams[teamName] && DATA.teams[teamName].c === playerName,
+            is_vc: DATA.teams[teamName] && DATA.teams[teamName].vc === playerName
+          };
+        }
+        computedPlayers[playerName].total = pts;
+        computedPlayers[playerName].team = teamName;
+        if (DATA.teams[teamName]) DATA.teams[teamName].total += pts;
+      });
+    });
+    // Recompute MVP using new totals
+    topMvp = {name:"—", team:"—", val:-1};
+    Object.entries(computedPlayers).forEach(([name, p]) => {
+      if (p.total > topMvp.val) topMvp = {name, team:p.team, val:p.total};
+    });
+  }
 
   DATA.sorted_teams = Object.entries(DATA.teams)
     .map(([name, data]) => [name, Math.round(data.total)])
